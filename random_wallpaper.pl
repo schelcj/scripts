@@ -15,6 +15,8 @@ Readonly::Scalar my $HISTORY       => qq{$PREFIX/history};
 Readonly::Scalar my $CATEGORY      => qq{$PREFIX/category};
 Readonly::Scalar my $WALLPAPER_DIR => qq{$PREFIX/Wallpapers};
 Readonly::Scalar my $DISPLAY       => qq{$PREFIX/display};
+Readonly::Scalar my $CURRENT       => qq{$PREFIX/current};
+Readonly::Scalar my $RESOLUTION    => qq{$PREFIX/resolution};
 Readonly::Scalar my $BGSETTER      => q{fbsetbg};
 Readonly::Scalar my $BGSETTER_OPTS => q{-a};
 Readonly::Scalar my $SLASH         => q{/};
@@ -47,11 +49,16 @@ if ($opts->{category}) {
 
   $category = $opts->{category};
   write_file($CATEGORY, $category);
+} else {
+  unlink $CATEGORY;
 }
 
 if ($opts->{resolution} and $opts->{category}) {
   $wallpaper_dir = join($SLASH, $WALLPAPER_DIR, $opts->{category}, $opts->{resolution});
   confess qq{Wallpaper resolution ($wallpaper_dir) does not exist} if not -e $wallpaper_dir;
+  write_file($RESOLUTION,$opts->{resolution});
+} else {
+  unlink $RESOLUTION;
 }
 
 if ($opts->{'flush-cache'}) {
@@ -84,6 +91,7 @@ sub _set {
     if (not is_cached(\%history, $paper)) {
       set_wallpaper($paper);
       cache(\%history, $paper);
+      write_file($CURRENT, $paper);
       $set_paper = 1;
       last;
     }
