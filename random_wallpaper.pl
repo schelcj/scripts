@@ -14,9 +14,9 @@ Readonly::Scalar my $LOCK          => qq{$PREFIX/lock};
 Readonly::Scalar my $HISTORY       => qq{$PREFIX/history};
 Readonly::Scalar my $CATEGORY      => qq{$PREFIX/category};
 Readonly::Scalar my $WALLPAPER_DIR => qq{$PREFIX/Wallpapers};
+Readonly::Scalar my $DISPLAY       => qq{$PREFIX/display};
 Readonly::Scalar my $BGSETTER      => q{fbsetbg};
 Readonly::Scalar my $BGSETTER_OPTS => q{-a};
-Readonly::Scalar my $DISPLAY       => qq{$PREFIX/display};
 Readonly::Scalar my $SLASH         => q{/};
 
 ## no tidy
@@ -26,6 +26,8 @@ my $opts = Getopt::Compact->new(
     [[qw(r resolution)],  q(Wallpaper resolution), ':s'],
     [[qw(f flush-cache)], q(Flush the wallpaper cache) ],
     [[qw(d dump-cache)],  q(Dump the wallpaper cache)  ],
+    [[qw(l lock)],        q(Lock the current paper)    ],
+    [[qw(u unlock)],      q(Unlock the current paper)  ],
   ]
 )->opts();
 ## end no tidy
@@ -36,6 +38,8 @@ my $category      = 'all';
 my $wallpaper_dir = qq{$PREFIX/all};
 
 tie %history, 'DB_File', $HISTORY; ## no critic (ProhibitTies)
+
+exit if -e $LOCK and not $opts->{unlock};
 
 if ($opts->{category}) {
   $wallpaper_dir = join($SLASH, $WALLPAPER_DIR, $opts->{category});
@@ -57,6 +61,16 @@ if ($opts->{'flush-cache'}) {
 
 if ($opts->{'dump-cache'}) {
   print {*STDOUT} Dumper \%history;
+  exit;
+}
+
+if ($opts->{lock}) {
+  write_file($LOCK, '1');
+  exit;
+}
+
+if ($opts->{unlock}) {
+  unlink $LOCK;
   exit;
 }
 
@@ -85,6 +99,8 @@ sub _set {
 }
 
 _set();
+
+untie %history;
 
 sub get_display {
   return read_file($DISPLAY);
