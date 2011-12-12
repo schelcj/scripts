@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use FindBin qw($Bin);
+use local::lib qq{$Bin/../perl5};
 use Modern::Perl;
 use Carp qw(confess);
 use Readonly;
@@ -62,7 +64,7 @@ if ($opts->{resolution} and $opts->{category}) {
 }
 
 if ($opts->{'flush-cache'}) {
-  flush_cache(\%history);
+  flush_cache();
   exit;
 }
 
@@ -87,14 +89,16 @@ for my $wallpaper (read_dir($wallpaper_dir)) {
 
 sub _set {
   my $set_paper = 0;
+
+  if (scalar @wallpapers == 1) {
+    set_wallpaper($wallpapers[0]);
+    return;
+  }
+
   while (my $paper = get_random_wallpaper(\@wallpapers)) {
-    if (not is_cached(\%history, $paper)) {
-      set_wallpaper($paper);
-      cache(\%history, $paper);
-      write_file($CURRENT, $paper);
-      $set_paper = 1;
-      last;
-    }
+    set_wallpaper($paper);
+    $set_paper = 1;
+    last;
   }
 
   if (not $set_paper) {
@@ -130,6 +134,9 @@ sub get_random_wallpaper {
 
 sub set_wallpaper {
   my ($paper) = @_;
+
+  return if is_cached($paper);
+
   my $cmd_str = sprintf q{DISPLAY=%s %s %s}, get_display(), get_bgsetter(), $paper;
   my $cmd     = System::Command->new($cmd_str);
   my $stdout  = $cmd->stdout();
@@ -137,22 +144,24 @@ sub set_wallpaper {
   while (<$stdout>) { print $_ }
   $cmd->close();
 
+  cache($paper);
+  write_file($CURRENT, $paper);
+
   return;
 }
 
 sub cache {
-  my ($hist,$paper) = @_;
-  $hist->{$paper} = 1;
+  my ($paper) = @_;
+  $history{$paper} = 1;
   return;
 }
 
 sub is_cached {
-  my ($hist,$paper) = @_;
-  return exists $hist->{$paper};
+  my ($paper) = @_;
+  return exists $history{$paper};
 }
 
 sub flush_cache {
-  my ($hist) = @_;
-  %{$hist} = ();
+  %history = ();
   return;
 }
