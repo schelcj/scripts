@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# -fn 6x13
+# cmd="rxvt +sb -rv -ls -sl 5000"
+# cmd="aterm -sl 5000 +sb -ls -tr -sh 15 -bgtype cut"
+cmd="gnome-terminal"
+host=$(echo $0|sed -e 's/\/home\/schelcj\/bin\///')
+
+if [ "$host" != "term" ]; then
+  args="--title $host -x ssh $host"
+else
+  args="--title $(hostname) $@"
+fi
+
+exec $cmd $args
