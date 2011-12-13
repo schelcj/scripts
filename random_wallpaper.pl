@@ -11,57 +11,50 @@ use File::Slurp qw(read_file read_dir write_file append_file);
 use Getopt::Compact;
 use Data::Dumper;
 
-Readonly::Scalar my $PREFIX        => qq($ENV{HOME}/.wallpapers);
-Readonly::Scalar my $LOCK          => qq{$PREFIX/lock};
-Readonly::Scalar my $HISTORY       => qq{$PREFIX/history};
-Readonly::Scalar my $CATEGORY      => qq{$PREFIX/category};
-Readonly::Scalar my $WALLPAPER_DIR => qq{$PREFIX/Wallpapers};
-Readonly::Scalar my $DISPLAY       => qq{$PREFIX/display};
-Readonly::Scalar my $CURRENT       => qq{$PREFIX/current};
-Readonly::Scalar my $RESOLUTION    => qq{$PREFIX/resolution};
-Readonly::Scalar my $LOG           => qq{$PREFIX/log};
-Readonly::Scalar my $BGSETTER      => q{fbsetbg};
-Readonly::Scalar my $BGSETTER_OPTS => q{-a};
-Readonly::Scalar my $SLASH         => q{/};
+Readonly::Scalar my $PREFIX           => qq($ENV{HOME}/.wallpapers);
+Readonly::Scalar my $LOCK             => qq{$PREFIX/lock};
+Readonly::Scalar my $HISTORY          => qq{$PREFIX/history};
+Readonly::Scalar my $CATEGORY         => qq{$PREFIX/category};
+Readonly::Scalar my $WALLPAPER_DIR    => qq{$PREFIX/Wallpapers};
+Readonly::Scalar my $DISPLAY          => qq{$PREFIX/display};
+Readonly::Scalar my $CURRENT          => qq{$PREFIX/current};
+Readonly::Scalar my $RESOLUTION       => qq{$PREFIX/resolution};
+Readonly::Scalar my $LOG              => qq{$PREFIX/log};
+Readonly::Scalar my $BGSETTER         => q{fbsetbg};
+Readonly::Scalar my $BGSETTER_OPTS    => q{-a};
+Readonly::Scalar my $SLASH            => q{/};
+Readonly::Scalar my $DEFAULT_CATEGORY => q{all};
 
 ## no tidy
 my $opts = Getopt::Compact->new(
   struct => [
-    [[qw(c category)],    q(Wallpaper category),   ':s'],
-    [[qw(r resolution)],  q(Wallpaper resolution), ':s'],
-    [[qw(f flush-cache)], q(Flush the wallpaper cache) ],
-    [[qw(d dump-cache)],  q(Dump the wallpaper cache)  ],
-    [[qw(l lock)],        q(Lock the current paper)    ],
-    [[qw(u unlock)],      q(Unlock the current paper)  ],
+    [[qw(c category)],    q(Wallpaper category),          ':s'],
+    [[qw(r resolution)],  q(Wallpaper resolution),        ':s'],
+    [[qw(f flush-cache)], q(Flush the wallpaper cache)        ],
+    [[qw(d dump-cache)],  q(Dump the wallpaper cache)         ],
+    [[qw(l lock)],        q(Lock the current paper)           ],
+    [[qw(u unlock)],      q(Unlock the current paper)         ],
+    [[qw(clear)],         q(Clear previous category/resoution)],
   ]
 )->opts();
 ## end no tidy
 
-my %history       = ();
-my @wallpapers    = ();
-my $category      = 'all';
-my $wallpaper_dir = qq{$PREFIX/all};
-
-tie %history, 'DB_File', $HISTORY; ## no critic (ProhibitTies)
-
 exit if -e $LOCK and not $opts->{unlock};
 
-if ($opts->{category}) {
-  $wallpaper_dir = join($SLASH, $WALLPAPER_DIR, $opts->{category});
-  confess qq{Wallpaper category ($wallpaper_dir) does not exist} if not -e $wallpaper_dir;
+my %history = ();
+tie %history, 'DB_File', $HISTORY; ## no critic (ProhibitTies)
 
-  $category = $opts->{category};
-  write_file($CATEGORY, $category);
-} else {
+if ($opts->{clear}) {
   unlink $CATEGORY;
+  unlink $RESOLUTION;
+}
+
+if ($opts->{category}) {
+  write_file($CATEGORY, $opts->{category});
 }
 
 if ($opts->{resolution} and $opts->{category}) {
-  $wallpaper_dir = join($SLASH, $WALLPAPER_DIR, $opts->{category}, $opts->{resolution});
-  confess qq{Wallpaper resolution ($wallpaper_dir) does not exist} if not -e $wallpaper_dir;
   write_file($RESOLUTION,$opts->{resolution});
-} else {
-  unlink $RESOLUTION;
 }
 
 if ($opts->{'flush-cache'}) {
@@ -84,11 +77,10 @@ if ($opts->{unlock}) {
   exit;
 }
 
-for my $wallpaper (read_dir($wallpaper_dir)) {
-  push @wallpapers, join($SLASH, $wallpaper_dir, $wallpaper);
-}
+my $wallpaper_dir = get_wallpaper_dir();
+my @wallpapers    = get_wallpapers($wallpaper_dir);
+my $rv            = _set();
 
-my $rv = _set();
 exit $rv;
 
 sub _set {
@@ -115,12 +107,38 @@ sub _set {
   return _set();
 }
 
-sub get_display {
-  return read_file($DISPLAY);
+sub get_wallpaper_dir {
+  my @paths      = ();
+  my $category   = get_category();
+  my $resolution = get_resolution();
+
+  if ($category eq $DEFAULT_CATEGORY) {
+    push @paths, $PREFIX;
+  } else {
+    push @paths, $WALLPAPER_DIR;
+  }
+
+  push @paths, $category;
+
+  if (defined $resolution) {
+    push @paths, $resolution;
+  }
+
+  my $dir = join($SLASH, @paths);
+  confess qq{Wallpaper directory ($dir) does not exist} if not -e $dir;
+
+  return $dir;
 }
 
-sub get_bgsetter {
-  return sprintf q{%s %s}, $BGSETTER, $BGSETTER_OPTS;
+sub get_wallpapers {
+  my ($dir)  = @_;
+  my @papers = ();
+
+  for my $wallpaper (read_dir($dir)) {
+    push @papers, join($SLASH, $dir, $wallpaper);
+  }
+
+  return @papers;
 }
 
 sub get_random_wallpaper {
@@ -138,7 +156,7 @@ sub set_wallpaper {
 
   return if is_cached($paper);
 
-  my $cmd_str = sprintf q{DISPLAY=%s %s %s}, get_display(), get_bgsetter(), $paper;
+  my $cmd_str = sprintf q{%s %s}, get_bgsetter(), $paper;
   my $cmd     = System::Command->new($cmd_str);
   my $stdout  = $cmd->stdout();
   my $stderr  = $cmd->stderr();
@@ -156,6 +174,22 @@ sub set_wallpaper {
   write_file($CURRENT, $paper);
 
   return $cmd->exit();
+}
+
+sub get_display {
+  return read_file($DISPLAY);
+}
+
+sub get_category {
+  return (-e $CATEGORY) ? read_file($CATEGORY) : $DEFAULT_CATEGORY;
+}
+
+sub get_resolution {
+  return (-e $RESOLUTION) ? read_file($RESOLUTION) : undef;
+}
+
+sub get_bgsetter {
+  return sprintf q{%s %s}, $BGSETTER, $BGSETTER_OPTS;
 }
 
 sub cache {
