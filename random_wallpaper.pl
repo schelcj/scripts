@@ -89,7 +89,6 @@ for my $wallpaper (read_dir($wallpaper_dir)) {
 }
 
 my $rv = _set();
-untie %history;
 exit $rv;
 
 sub _set {
