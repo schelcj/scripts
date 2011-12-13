@@ -7,7 +7,7 @@ use Carp qw(confess);
 use Readonly;
 use DB_File;
 use System::Command;
-use File::Slurp qw(read_file read_dir write_file);
+use File::Slurp qw(read_file read_dir write_file append_file);
 use Getopt::Compact;
 use Data::Dumper;
 
@@ -19,6 +19,7 @@ Readonly::Scalar my $WALLPAPER_DIR => qq{$PREFIX/Wallpapers};
 Readonly::Scalar my $DISPLAY       => qq{$PREFIX/display};
 Readonly::Scalar my $CURRENT       => qq{$PREFIX/current};
 Readonly::Scalar my $RESOLUTION    => qq{$PREFIX/resolution};
+Readonly::Scalar my $LOG           => qq{$PREFIX/log};
 Readonly::Scalar my $BGSETTER      => q{fbsetbg};
 Readonly::Scalar my $BGSETTER_OPTS => q{-a};
 Readonly::Scalar my $SLASH         => q{/};
@@ -87,16 +88,21 @@ for my $wallpaper (read_dir($wallpaper_dir)) {
   push @wallpapers, join($SLASH, $wallpaper_dir, $wallpaper);
 }
 
+my $rv = _set();
+untie %history;
+exit $rv;
+
 sub _set {
+  my $rc        = 0;
   my $set_paper = 0;
 
   if (scalar @wallpapers == 1) {
-    set_wallpaper($wallpapers[0]);
-    return;
+    $rc = set_wallpaper($wallpapers[0]);
+    return $rc;
   }
 
   while (my $paper = get_random_wallpaper(\@wallpapers)) {
-    set_wallpaper($paper);
+    $rc = set_wallpaper($paper);
     $set_paper = 1;
     last;
   }
@@ -104,15 +110,11 @@ sub _set {
   if (not $set_paper) {
     flush_cache();
   } else {
-    return;
+    return $rc;
   }
 
   return _set();
 }
-
-_set();
-
-untie %history;
 
 sub get_display {
   return read_file($DISPLAY);
@@ -140,14 +142,21 @@ sub set_wallpaper {
   my $cmd_str = sprintf q{DISPLAY=%s %s %s}, get_display(), get_bgsetter(), $paper;
   my $cmd     = System::Command->new($cmd_str);
   my $stdout  = $cmd->stdout();
+  my $stderr  = $cmd->stderr();
 
-  while (<$stdout>) { print $_ }
+  while (<$stdout>) {
+    append_file($LOG, $_);
+  }
+
+  while (<$stderr>) {
+    append_file($LOG, $_);
+  }
+
   $cmd->close();
-
   cache($paper);
   write_file($CURRENT, $paper);
 
-  return;
+  return $cmd->exit();
 }
 
 sub cache {
