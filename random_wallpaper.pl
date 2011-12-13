@@ -16,7 +16,6 @@ Readonly::Scalar my $LOCK             => qq{$PREFIX/lock};
 Readonly::Scalar my $HISTORY          => qq{$PREFIX/history};
 Readonly::Scalar my $CATEGORY         => qq{$PREFIX/category};
 Readonly::Scalar my $WALLPAPER_DIR    => qq{$PREFIX/Wallpapers};
-Readonly::Scalar my $DISPLAY          => qq{$PREFIX/display};
 Readonly::Scalar my $CURRENT          => qq{$PREFIX/current};
 Readonly::Scalar my $RESOLUTION       => qq{$PREFIX/resolution};
 Readonly::Scalar my $LOG              => qq{$PREFIX/log};
@@ -174,10 +173,6 @@ sub set_wallpaper {
   write_file($CURRENT, $paper);
 
   return $cmd->exit();
-}
-
-sub get_display {
-  return read_file($DISPLAY);
 }
 
 sub get_category {
