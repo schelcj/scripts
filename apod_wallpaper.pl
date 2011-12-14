@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use FindBin qw($Bin);
+use local::lib qq{$Bin/../perl5};
 use Modern::Perl;
 use Mojo::UserAgent;
 use System::Command;
