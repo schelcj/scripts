@@ -88,13 +88,14 @@ sub _set {
 
   if (scalar @wallpapers == 1) {
     $rc = set_wallpaper($wallpapers[0]);
-    return $rc;
-  }
-
-  while (my $paper = get_random_wallpaper(\@wallpapers)) {
-    $rc = set_wallpaper($paper);
     $set_paper = 1;
-    last;
+  } else {
+    while (my $paper = get_random_wallpaper(\@wallpapers)) {
+      next if is_cached($paper);
+      $rc = set_wallpaper($paper);
+      $set_paper = 1;
+      last;
+    }
   }
 
   if (not $set_paper) {
@@ -152,8 +153,6 @@ sub get_random_wallpaper {
 
 sub set_wallpaper {
   my ($paper) = @_;
-
-  return if is_cached($paper);
 
   my $cmd_str = sprintf q{%s %s}, get_bgsetter(), $paper;
   my $cmd     = System::Command->new($cmd_str);
