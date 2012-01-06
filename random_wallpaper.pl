@@ -18,6 +18,7 @@ Readonly::Scalar my $CATEGORY         => qq{$PREFIX/category};
 Readonly::Scalar my $WALLPAPER_DIR    => qq{$PREFIX/Wallpapers};
 Readonly::Scalar my $CURRENT          => qq{$PREFIX/current};
 Readonly::Scalar my $RESOLUTION       => qq{$PREFIX/resolution};
+Readonly::Scalar my $PREVIOUS         => qq{$PREFIX/previous};
 Readonly::Scalar my $LOG              => qq{$PREFIX/log};
 Readonly::Scalar my $BGSETTER         => q{fbsetbg};
 Readonly::Scalar my $BGSETTER_OPTS    => q{-a};
@@ -34,6 +35,7 @@ my $opts = Getopt::Compact->new(
     [[qw(l lock)],        q(Lock the current paper)           ],
     [[qw(u unlock)],      q(Unlock the current paper)         ],
     [[qw(clear)],         q(Clear previous category/resoution)],
+    [[qw(p previous)],    q(Set wallpaper to previous paper)  ],
   ]
 )->opts();
 ## end no tidy
@@ -73,6 +75,12 @@ if ($opts->{lock}) {
 
 if ($opts->{unlock}) {
   unlink $LOCK;
+  exit;
+}
+
+if ($opts->{previous}) {
+  my $paper = read_file($PREVIOUS);
+  set_wallpaper($paper);
   exit;
 }
 
@@ -169,9 +177,16 @@ sub set_wallpaper {
 
   $cmd->close();
   cache($paper);
-  write_file($CURRENT, $paper);
+  set_current($paper);
 
   return $cmd->exit();
+}
+
+sub set_current {
+  my ($paper) = @_;
+  rename $CURRENT, $PREVIOUS;
+  write_file($CURRENT, $paper);
+  return;
 }
 
 sub get_category {
