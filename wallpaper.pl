@@ -10,6 +10,7 @@ use System::Command;
 use File::Slurp qw(read_file read_dir write_file append_file);
 use Getopt::Compact;
 use Data::Dumper;
+use File::Find::Object;
 
 Readonly::Scalar my $PREFIX           => qq($ENV{HOME}/.wallpapers);
 Readonly::Scalar my $LOCK             => qq{$PREFIX/lock};
@@ -20,6 +21,7 @@ Readonly::Scalar my $CURRENT          => qq{$PREFIX/current};
 Readonly::Scalar my $RESOLUTION       => qq{$PREFIX/resolution};
 Readonly::Scalar my $PREVIOUS         => qq{$PREFIX/previous};
 Readonly::Scalar my $LOG              => qq{$PREFIX/log};
+Readonly::Scalar my $SOURCES          => qq{$PREFIX/sources};
 Readonly::Scalar my $BGSETTER         => q{fbsetbg};
 Readonly::Scalar my $BGSETTER_OPTS    => q{-a};
 Readonly::Scalar my $SLASH            => q{/};
@@ -84,9 +86,9 @@ if ($opts->{previous}) {
   exit;
 }
 
-my $wallpaper_dir = get_wallpaper_dir();
-my @wallpapers    = get_wallpapers($wallpaper_dir);
-my $rv            = _set();
+my @wallpaper_dirs = get_wallpaper_dirs();
+my @wallpapers     = get_wallpapers(@wallpaper_dirs);
+my $rv             = _set();
 
 exit $rv;
 
@@ -115,13 +117,19 @@ sub _set {
   return _set();
 }
 
-sub get_wallpaper_dir {
-  my @paths      = ();
-  my $category   = get_category();
+sub _build_path {
+  my ($dir) = @_;
+  chomp $dir;
+  return qq{$WALLPAPER_DIR/$dir};
+}
+
+sub get_wallpaper_dirs {
+  my @paths = ();
+  my $category = get_category();
   my $resolution = get_resolution();
 
   if ($category eq $DEFAULT_CATEGORY) {
-    push @paths, $PREFIX;
+    return map {_build_path($_)} read_file($SOURCES);
   } else {
     push @paths, $WALLPAPER_DIR;
   }
@@ -135,15 +143,16 @@ sub get_wallpaper_dir {
   my $dir = join($SLASH, @paths);
   confess qq{Wallpaper directory ($dir) does not exist} if not -e $dir;
 
-  return $dir;
+  return ($dir);
 }
 
 sub get_wallpapers {
-  my ($dir)  = @_;
+  my (@dirs) = @_;
+  my $tree   = File::Find::Object->new({}, @dirs);
   my @papers = ();
 
-  for my $wallpaper (read_dir($dir)) {
-    push @papers, join($SLASH, $dir, $wallpaper);
+  while (my $leaf = $tree->next()) {
+    push @papers, $leaf;
   }
 
   return @papers;
@@ -162,7 +171,7 @@ sub get_random_wallpaper {
 sub set_wallpaper {
   my ($paper) = @_;
 
-  my $cmd_str = sprintf q{%s %s}, get_bgsetter(), $paper;
+  my $cmd_str = sprintf q{%s '%s'}, get_bgsetter(), $paper;
   my $cmd     = System::Command->new($cmd_str);
   my $stdout  = $cmd->stdout();
   my $stderr  = $cmd->stderr();
