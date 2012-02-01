@@ -7,7 +7,7 @@ use Carp qw(confess);
 use Readonly;
 use DB_File;
 use System::Command;
-use File::Slurp qw(read_file read_dir write_file append_file);
+use File::Slurp qw(read_file write_file append_file);
 use Getopt::Compact;
 use Data::Dumper;
 use File::Find::Object;
@@ -152,7 +152,7 @@ sub get_wallpapers {
   my @papers = ();
 
   while (my $leaf = $tree->next()) {
-    push @papers, $leaf;
+    push @papers, $leaf if not -d $leaf;
   }
 
   return @papers;
