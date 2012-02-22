@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 
-use FindBin qw($Bin);
-use local::lib qq{$Bin/../perl5};
+use local::lib qq($ENV{HOME}/perl5);
 use Modern::Perl;
 use Carp qw(confess);
 use Readonly;
@@ -41,6 +40,7 @@ my $opts = Getopt::Compact->new(
   ]
 )->opts();
 ## end no tidy
+
 
 exit if -e $LOCK and not $opts->{unlock};
 
