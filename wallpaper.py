@@ -17,27 +17,33 @@ class WallPaper(object):
     self._bgsetter         = 'fbsetbg -a'
     self._default_category = 'all'
 
-  def set_wallpaper(self):
+  def __process_args(self):
     if self.args.dump_cache:
       self.dump_cache()
+      exit()
 
     elif self.args.flush_cache:
       self.flush_cache()
+      exit()
 
     elif self.args.clear:
       self.clear()
 
     elif self.args.unlock:
       self.unlock()
+      exit()
 
     elif self.args.lock:
       self.lock()
+      exit()
 
     elif self.is_locked and not self.args.unlock:
       print "currently locked, bailing out"
+      exit()
 
     elif self.args.previous:
       self.set_previous()
+      exit()
 
   def parse_args(self):
     parser = argparse.ArgumentParser(description='Wallpaper changer thingus')
@@ -83,16 +89,18 @@ class WallPaper(object):
         action='store_true')
 
     self.args = parser.parse_args()
+    self.__process_args()
 
   def lock(self):
     f = open(self._lock,'w')
     f.close()
 
   def unlock(self):
-    os.remove(self._lock)
+    if self.is_locked():
+      os.remove(self._lock)
 
   def is_locked(self):
-    os.path.exists(self._lock)
+    return os.path.exists(self._lock)
 
   def set_previous(self):
     print "set_previous(self)"
@@ -110,4 +118,3 @@ if __name__ == '__main__':
   wallpaper = WallPaper()
   wallpaper.parse_args()
   wallpaper.set_wallpaper()
-  print wallpaper.args
