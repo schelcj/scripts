@@ -4,8 +4,10 @@ import argparse
 import os
 
 class WallPaper(object):
-  def __init__(self):
-    self.args             = self.__parse()
+  def __new__(typ, *args, **kwargs):
+    self = super(WallPaper,typ).__new__(typ, *args, **kwargs)
+
+    self.args              = self.__parse()
     self._prefix           = os.getenv('HOME') + '/.wallpapers2/'
     self._lock             = self._prefix + 'lock'
     self._hist             = self._prefix + 'history.db'
@@ -17,6 +19,33 @@ class WallPaper(object):
     self._sources          = self._prefix + 'sources'
     self._bgsetter         = 'fbsetbg -a'
     self._default_category = 'all'
+
+    return self
+
+  def __init__(self):
+    if self.args.dump_cache:
+      print "print the cache to stdout"
+      exit()
+
+    elif self.args.flush_cache:
+      print "flush the cache"
+      exit()
+
+    elif self.args.clear:
+      print "clear category/resolution history"
+
+    elif self.args.lock:
+      self.lock()
+      exit()
+
+    elif self.is_locked and not self.args.unlock:
+      print "currently locked, bailing out"
+      exit()
+
+    elif self.args.previous:
+      self.set_previous()
+      exit()
+
 
   def __parse(self):
     parser = argparse.ArgumentParser(description='Wallpaper changer thingus')
@@ -74,7 +103,4 @@ class WallPaper(object):
 
 if __name__ == '__main__':
   wallpaper = WallPaper()
-
-  if wallpaper.is_locked and not wallpaper.args.unlock:
-    print "currently locked, bailing out"
-    exit
+  print wallpaper.args
