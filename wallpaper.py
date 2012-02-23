@@ -17,6 +17,11 @@ class WallPaper(object):
     self._bgsetter         = 'fbsetbg -a'
     self._default_category = 'all'
 
+    self.category   = self._get_category()
+    self.resolution = self._get_resolution()
+    self.sources    = self._get_source_dirs()
+    self.wallpapers = self._get_wallpapers()
+
   def __process_args(self):
     if self.args.dump_cache:
       self.dump_cache()
@@ -44,6 +49,48 @@ class WallPaper(object):
     elif self.args.previous:
       self.set_previous()
       exit()
+
+  def _get_category(self):
+    category = self._default_category
+
+    if self.args.category:
+      category = self.args.category
+    elif os.path.exists(self._category):
+      category = file(self._category).read()
+
+    return category
+
+  def _get_resolution(self):
+    resolution = ''
+
+    if self.args.resolution:
+      resolution = self.args.resolution
+    elif os.path.exists(self._resolution):
+      resolution = file(self._resolution).read()
+
+    return resolution
+
+
+  def _get_source_dirs(self):
+    dirs = []
+
+    if self.category == 'all':
+      for source in file(self._sources).read():
+        dirs.append(self._wallpaper_dir + '/' + source)
+
+    else
+
+    return dirs
+
+  def _get_wallpapers(self):
+    wallpapers = []
+
+    for source in self.sources:
+      for root, dirs, files in os.walk(source):
+        for file in files
+          wallpapers.append(os.path.join(root,file))
+
+    return wallpapers
 
   def parse_args(self):
     parser = argparse.ArgumentParser(description='Wallpaper changer thingus')
