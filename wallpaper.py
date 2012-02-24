@@ -36,8 +36,9 @@ class WallPaper(object):
     else:
       self.category = self._default_category
 
-    with open(self._category, 'w') as f:
-      f.write(self.category)
+    if self.category != self._default_category:
+      with open(self._category, 'w') as f:
+        f.write(self.category)
 
   def _build_resolution(self):
     if self.args.resolution:
@@ -55,8 +56,8 @@ class WallPaper(object):
 
   def _build_source_dirs(self):
     if self.category == self._default_category:
-      for source in file(self._sources).read():
-        self.sources.append(os.path.join(self._wallpaper_dir,source))
+      for source in file(self._sources).readlines():
+        self.sources.append(os.path.join(self._wallpaper_dir,source.rstrip()))
 
     else:
       self.sources.append(os.path.join(self._wallpaper_dir,self.category))
@@ -153,13 +154,14 @@ if __name__ == '__main__':
   elif wallpaper.args.lock:
     wallpaper.lock()
 
-  elif wallpaper.is_locked and not wallpaper.args.unlock:
+  elif wallpaper.is_locked() and not wallpaper.args.unlock:
     print "currently locked, bailing out"
 
   elif wallpaper.args.previous:
     wallpaper.set_previous()
 
   else:
-    wallpaper.set_wallpaper()
+    #wallpaper.set_wallpaper()
+    print wallpaper.wallpapers
 
 
