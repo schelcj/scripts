@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import random
 
 class WallPaper(object):
   def __init__(self):
@@ -113,6 +114,12 @@ class WallPaper(object):
 
     self.args = parser.parse_args()
 
+  def _set_wallpaper(self, paper):
+    print paper
+  
+  def _get_random_wallpaper(self):
+    return random.choice(self.wallpapers)
+
   def lock(self):
     f = open(self._lock,'w')
     f.close()
@@ -135,6 +142,11 @@ class WallPaper(object):
 
   def dump_cache(self):
     print "dump_cache(self)"
+
+  def set_wallpaper(self):
+    if len(self.wallpapers) == 1:
+      _set_wallpaper(self.wallpapers[0])
+
 
 if __name__ == '__main__':
   wallpaper = WallPaper()
