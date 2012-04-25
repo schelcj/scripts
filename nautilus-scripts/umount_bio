@@ -1,0 +1,2 @@
+#!/bin/sh
+gksudo umount /home/schelcj/BIO

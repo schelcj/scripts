@@ -1,0 +1,8 @@
+#!/bin/sh
+
+for arg; do
+  file="$(echo "$arg" | tr "[:upper:]" "[:lower:]" | tr "[:blank:]" _)"
+  if [ ! -f $file ]; then
+    mv "$arg" "$file"
+  fi
+done
