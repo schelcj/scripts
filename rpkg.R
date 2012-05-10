@@ -2,30 +2,34 @@
 
 library(getopt);
 
-mirror    <- 'http://cran.mtu.edu/';
-base_repo <- '/home/software';
 codename  <- system("lsb_release -c|awk {'print $2'}", intern=TRUE);
-site_lib  <- paste(sep='/', base_repo, codename, 'R', getRversion(), 'site-library');
+site_lib  <- paste(sep='/', '/home/software', codename, 'R', getRversion(), 'site-library');
 
 .libPaths(site_lib);
+options(repos='http://cran.mtu.edu/');
 
 opt <- getopt(matrix(c(
   'help',         'h', 0, "logical",   "Usage information",
-  'package',      'p', 1, "character", "Package name to install",
-  'bioconductor', 'b', 0, "logical",   "Package is a bioconductor package"
+  'package',      'p', 1, "character", "Package name to install"
 ),ncol=5,byrow=TRUE));
 
 if (!is.null(opt$help)) {
   writeLines("Usage: test.R [options]");
   writeLines("\t--help,h\t\tPrint usage options");
   writeLines("\t--package,p\t\tPackage name to install");
-  writeLines("\t--bioconductor,b\tPackage to install is in the Bioconductor repo");
   q(status=1);
 }
 
-if (is.null(opt$bioconductor)) {
-  install.packages(opt$package, dependencies=TRUE, repos=mirror);
-} else {
+options(warn=-1);
+install.packages(opt$package, dependencies=TRUE);
+if (!suppressWarnings(require(opt$package, quietly=TRUE))) {
   source("http://www.bioconductor.org/biocLite.R");
   biocLite(opt$package);
 }
+
+if (!suppressWarnings(require(opt$package, quietly=TRUE))) {
+  writeLines(paste(sep=" ", "\nUnable to find package", opt$package, "in cran or bioconductor"));
+  q(status=1);
+}
+
+q(status=0);
