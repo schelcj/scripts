@@ -23,12 +23,9 @@ function install_packages() {
     liblocal-lib-perl \
     syspeek \
     my-weather-indicator \
-    tmux \
-    most \
-    dstat \
-    iotop \
-    fluxbox \
-    htop 
+    tmux most dstat iotop fluxbox htop nmap \
+    traceroute git \
+    openvpn network-manager-openvpn
 }
 
 function setup_wallpapers() {
@@ -49,16 +46,19 @@ function setup_wallpapers() {
 
 function setup_homedir() {
   mkdir ~/perl5 ~/src ~/projects ~/tmp
+
   ln -s ~/Dropbox/bin ~/
   ln -s ~/Dropbox/dot-files/fluxbox ~/.fluxbox
   ln -s ~/Dropbox/dot-files/vim ~/.vim
   ln -s ~/Dropbox/dot-files/vimrc ~/.vimrc
   ln -s ~/Dropbox/dot-files/gvimrc ~/.gvimrc
   ln -s ~/Dropbox/dot-files/tmux.conf ~/.tmux.conf
-  ln -s ~/Dropbox/scripts/nautilus-scripts ~/.gnome2
+  ln -s ~/Dropbox/dot-files/todo ~/.todo
 }
 
 function setup_perl_env() {
+  cpanm Modern::Perl Readonly::XS System::Command Getopt::Compact
+  cpanm File::Slurp File::Find::Object
 }
 
 install_packages
@@ -73,5 +73,6 @@ sudo sed -i 's/export UBUNTU_MENU/echo ""; # export UBUNTU_MENU/g' /etc/X11/Xses
 sudo sed -i 's/lastwallpaper="${HOME}\/.fluxbox\/lastwallpaper"/lastwallpaper="${HOME}\/.wallpapers\/last"/g' $(which fbsetbg)
 
 echo "source ${HOME}/Dropbox/dot-files/bash/bashrc" >> ~/.bashrc
+ln -s ${HOME}/.bashrc ${HOME}/.bash_profile
 
 
