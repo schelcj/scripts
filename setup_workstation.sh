@@ -23,7 +23,7 @@ function install_packages() {
     liblocal-lib-perl \
     syspeek \
     my-weather-indicator \
-    tmux most dstat iotop fluxbox htop nmap \
+    tmux most dstat iotop fluxbox htop nmap powertop \
     traceroute git \
     openvpn network-manager-openvpn
 }
