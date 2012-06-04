@@ -10,26 +10,23 @@ options(repos='http://cran.mtu.edu/');
 
 opt <- getopt(matrix(c(
   'help',         'h', 0, "logical",   "Usage information",
-  'package',      'p', 1, "character", "Package name to install"
+  'package',      'p', 1, "character", "Package name to install",
+  'bioconductor', 'b', 0, "logical",   "Package is in the bioconductor repo"
 ),ncol=5,byrow=TRUE));
 
 if (!is.null(opt$help)) {
   writeLines("Usage: test.R [options]");
   writeLines("\t--help,h\t\tPrint usage options");
   writeLines("\t--package,p\t\tPackage name to install");
+  writeLines("\t--bioconductor,b\t\tPackage is in the bioconductor repo");
   q(status=1);
 }
 
-options(warn=-1);
-install.packages(opt$package, dependencies=TRUE);
-if (!suppressWarnings(require(opt$package, quietly=TRUE))) {
+if (is.null(opt$bioconductor)) {
+  install.packages(opt$package, dependencies=TRUE);
+} else {
   source("http://www.bioconductor.org/biocLite.R");
   biocLite(opt$package);
-}
-
-if (!suppressWarnings(require(opt$package, quietly=TRUE))) {
-  writeLines(paste(sep=" ", "\nUnable to find package", opt$package, "in cran or bioconductor"));
-  q(status=1);
 }
 
 q(status=0);
