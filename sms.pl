@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+use FindBin qw($Bin);
+use lib qq($Bin/../perl5);
+
 use Modern::Perl;
 use Net::Netrc;
 use Google::Voice;
