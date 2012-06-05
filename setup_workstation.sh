@@ -21,11 +21,11 @@ function install_packages() {
     xscreensaver-screensaver-webcollage \
     zim \
     liblocal-lib-perl \
-    syspeek \
-    my-weather-indicator \
+    syspeek my-weather-indicator \
     tmux most dstat iotop fluxbox htop nmap powertop \
-    traceroute git \
-    openvpn network-manager-openvpn
+    traceroute git conky mc \
+    openvpn network-manager-openvpn \
+    cifs-utils smbfs smbclient
 }
 
 function setup_wallpapers() {
