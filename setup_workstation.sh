@@ -22,7 +22,7 @@ function install_packages() {
     zim \
     syspeek my-weather-indicator \
     tmux most dstat iotop fluxbox htop nmap powertop \
-    traceroute git conky mc \
+    traceroute git conky mc colortail \
     openvpn network-manager-openvpn \
     cifs-utils smbfs smbclient
 }
@@ -57,9 +57,13 @@ function setup_homedir() {
 
 function setup_perl_env() {
   mkdir ~/perl5
-  sudo apt-get install perl-doc liblocal-lib-perl
+
+  sudo apt-get install perl-doc liblocal-lib-perl \
+      libtest-perl-critic-perl perltidy ack-grep
+
   cpanm Modern::Perl Readonly::XS System::Command Getopt::Compact
   cpanm File::Slurp File::Find::Object
+  cpanm App::perlfind
 }
 
 install_packages
