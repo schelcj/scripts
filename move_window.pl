@@ -20,6 +20,7 @@ my $window    = <$zenity_fh>;
 $zenity_fh->close();
 
 if ($window) {
-  System::Command->new(qq{wmctrl -r $window -e 0,0,0,-1,-1});
-  System::Command->new(qq{wmctrl -R $window});
+  chomp($window);
+  System::Command->new(qq{wmctrl -r '$window' -e 1,0,0,-1,-1});
+  System::Command->new(qq{wmctrl -R '$window'});
 }
