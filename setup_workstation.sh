@@ -19,12 +19,12 @@ function install_packages() {
     xscreensaver-screensaver-bsod \
     xscreensaver-screensaver-dizzy \
     xscreensaver-screensaver-webcollage \
-    zim \
-    syspeek my-weather-indicator \
+    zim syspeek my-weather-indicator \
     tmux most dstat iotop fluxbox htop nmap powertop \
     traceroute git conky mc colortail \
     openvpn network-manager-openvpn \
-    cifs-utils smbfs smbclient
+    cifs-utils smbfs smbclient \
+    libxml2-dev libexpat1-dev
 }
 
 function setup_wallpapers() {
