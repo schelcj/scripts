@@ -10,7 +10,7 @@ use File::Slurp qw(write_file);
 use List::MoreUtils qw(any);
 
 my $params   = {};
-my $menu     = qq[$ENV{HOME}/.fluxbox/menu.rss];
+my $menu     = qq[$ENV{HOME}/Dropbox/dot-files/fluxbox/menu.rss];
 my @excludes = (qw(starred broadcast blogger-following));
 my $template = HTML::Template->new(filehandle => \*DATA, utf8 => 1);
 my $mach     = Net::Netrc->lookup('google.com');
