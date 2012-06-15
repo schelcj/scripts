@@ -6,12 +6,13 @@ function install_packages() {
   sudo add-apt-repository ppa:vicox/syspeek
   sudo add-apt-repository ppa:atareao/atareao
   sudo add-apt-repository ppa:jaap.karssenberg/zim
+  sudo add-apt-repository ppa:ricotz/testing
   sudo apt-get update
 
   sudo apt-get remove gnome-screensaver
   sudo apt-get install \
     vim vim-gnome ctags \
-    gnome-do \
+    gnome-do gnome-tweak-tool \
     xscreensaver \
     xscreensaver-data \
     xscreensaver-gl \
