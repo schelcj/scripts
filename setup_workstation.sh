@@ -60,7 +60,8 @@ function setup_perl_env() {
   mkdir ~/perl5
 
   sudo apt-get install perl-doc liblocal-lib-perl \
-      libtest-perl-critic-perl perltidy ack-grep
+      libtest-perl-critic-perl perltidy ack-grep \
+      libcrypt-ssleay-perl
 
   cpanm Modern::Perl Readonly::XS System::Command Getopt::Compact
   cpanm File::Slurp File::Find::Object
