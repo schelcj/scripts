@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+use FindBin qw($Bin);
+use lib qw($Bin../perl5/lib/perl5);
+
 use Modern::Perl;
 use WWW::Google::Contacts;
 use Net::Netrc;
