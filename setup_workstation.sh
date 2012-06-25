@@ -25,7 +25,7 @@ function install_packages() {
     traceroute git conky mc colortail \
     openvpn network-manager-openvpn \
     cifs-utils smbfs smbclient \
-    libxml2-dev libexpat1-dev
+    libxml2-dev libexpat1-dev htmldoc
 }
 
 function setup_wallpapers() {
