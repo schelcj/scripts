@@ -1,0 +1,4 @@
+#!/bin/sh
+for arg; do
+  cp "$arg" ${HOME}/Dropbox
+done

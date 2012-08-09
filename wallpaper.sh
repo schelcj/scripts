@@ -1,5 +1,6 @@
 #!/bin/sh
+
 while true; do
-  ${HOME}/scripts/wallpaper.pl
-  sleep 15m
+  source $(dirname $0)/set_wallpaper.sh
+  sleep 60m
 done
