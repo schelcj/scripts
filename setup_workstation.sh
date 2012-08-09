@@ -19,7 +19,7 @@ function install_packages() {
     xscreensaver-screensaver-bsod \
     xscreensaver-screensaver-dizzy \
     xscreensaver-screensaver-webcollage \
-    zim \
+    zim scrot \
     liblocal-lib-perl \
     syspeek \
     my-weather-indicator \
@@ -28,7 +28,8 @@ function install_packages() {
     dstat \
     iotop \
     fluxbox \
-    htop 
+    htop \
+    htmldoc
 }
 
 function setup_wallpapers() {
