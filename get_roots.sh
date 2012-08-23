@@ -1,2 +1,4 @@
-#!/bin/sh
-dig +nocmd +nocomments +nostats|grep -v 'AAAA'|grep -v '^;'|awk {'print $5'}|grep -v 'root-servers'
+#!/bin/bash
+for i in echo {a..m}; do
+  dig +nocmd +nocomments +nostats ${i}.root-servers.net|grep -v '^;'|awk {'print $5'}
+done
