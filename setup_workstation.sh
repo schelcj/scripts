@@ -21,11 +21,12 @@ function install_packages() {
     xscreensaver-screensaver-dizzy \
     xscreensaver-screensaver-webcollage \
     zim syspeek my-weather-indicator \
-    tmux most dstat iotop fluxbox htop nmap powertop \
+    tmux most dstat iotop fluxbox htop nmap powertop wireshark scrot i3 \
     traceroute git conky mc colortail \
     openvpn network-manager-openvpn \
     cifs-utils smbfs smbclient \
-    libxml2-dev libexpat1-dev
+    libxml2-dev libexpat1-dev htmldoc \
+    network-manager-vpnc
 }
 
 function setup_wallpapers() {
