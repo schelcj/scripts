@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# urxvt -rv -ls +sb -fn 9x15
+#
 # -fn 6x13
 # cmd="rxvt +sb -rv -ls -sl 5000"
 # cmd="aterm -sl 5000 +sb -ls -tr -sh 15 -bgtype cut"
