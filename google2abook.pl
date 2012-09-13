@@ -24,7 +24,7 @@ foreach my $account (@accounts) {
     next if not $contact->email;
     #next if not $contact->full_name;
 
-    $csv->add_line([$contact->full_name||"undef", join(q{,}, (map {$_->value} @{$contact->email}))]);
+    $csv->add_line([$contact->full_name||" ", join(q{,}, (map {$_->value} @{$contact->email}))]);
   }
 }
 
