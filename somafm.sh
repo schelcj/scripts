@@ -21,7 +21,7 @@ while true; do
       "u80s"                 "Underground 80s"        off \
       "secretagent"          "Secret Agent"           off \
       "suburbsofgoa"         "Suburbs of Goa"         off \
-      "beatbender"           "Beat Bender"            off \
+      "beatblender"          "Beat Blender"           off \
       "dubstep"              "Dub Step Beyond"        off \
       "cliqhopidm"           "cliqhop idm"            off \
       "spacestation"         "Space Station"          off \
