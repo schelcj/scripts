@@ -4,7 +4,7 @@ module load python
 module load offlineimap
 module load getmail
 
-ACCOUNTS=(Pobox Umich Avlug)
+ACCOUNTS=(Pobox Umich)
 
 for account in "${ACCOUNTS[@]}"; do
   offlineimap -u basic -o -a $account
