@@ -23,12 +23,12 @@ while true; do
       "suburbsofgoa"   "Suburbs of Goa"         off \
       "beatblender"    "Beat Blender"           off \
       "dubstep"        "Dub Step Beyond"        off \
-      "cliqhopidm"     "cliqhop idm"            off \
+      "cliqhop"        "cliqhop idm"            off \
       "spacestation"   "Space Station"          off \
       "missioncontrol" "Mission Control"        off \
       "bootliquor"     "Boot Liquor"            off \
       "illstreet"      "Illinois Street Lounge" off \
-      "tagstrip"       "Tags Trip"              off \
+      "tags"           "Tags Trip"              off \
       "doomed"         "Doomed"                 off \
       "brfm"           "Black Rock FM"          off \
       "sxfm"           "South by Soma"          off \
