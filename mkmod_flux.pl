@@ -10,6 +10,7 @@ use Readonly;
 use File::Spec;
 use File::Slurp qw(write_file);
 use autodie qw(:filesys);
+use Config::Tiny;
 
 Readonly::Scalar my $CAC_INCLUDES    => q{/home/software/systems/module-lib/cac-modules.tcl};
 Readonly::Scalar my $SPH_PATH        => q{/home/software/rhel6/sph};
@@ -18,14 +19,15 @@ Readonly::Scalar my $MODULEFILE_PATH => qq{$SPH_PATH/Modules/modulefiles};
 ## no tidy
 my $opts = Getopt::Compact->new(
   struct => [
-    [[qw(a app)],     q(Application Name), '=s'],
-    [[qw(v version)], q(Version Number),   '=s'], 
-    [[qw(d default)], q(Set as default version)], 
+    [[qw(c config)],  q(Config file),               '=s'],
+    [[qw(a app)],     q(Application Name),          '=s'],
+    [[qw(v version)], q(Version Number),            '=s'], 
+    [[qw(d default)], q(Set as default version)         ], 
+    [[qw(i include)], q(Create include description file)],
   ]
 )->opts();
 ## use tidy
 my $modulefile_dir     = get_modulefile_dir($opts->{app});
-my $modulefile         = get_modulefile($modulefile_dir, $opts->{version});
 my $modulefile_include = get_module_description($opts->{app});
 my $params             = get_params($opts->{app}, $opts->{version}, $modulefile_include);
 
@@ -34,11 +36,14 @@ if (not -e $modulefile_dir) {
   say "Created module directory $modulefile_dir";
 }
 
+my $modulefile = get_modulefile($modulefile_dir, $opts->{version});
 write_file($modulefile, get_modulefile_content());
 say "Wrote modulefile $modulefile";
 
-write_file($modulefile_include, get_modulefile_include_content());
-say "Wrote modulefile include $modulefile_include";
+if ($opts->{include}) {
+  write_file($modulefile_include, get_modulefile_include_content());
+  say "Wrote modulefile include $modulefile_include";
+}
 
 if ($opts->{default}) {
   my $default_version_file = File::Spec->join($modulefile_dir, '.version');
