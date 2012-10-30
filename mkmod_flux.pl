@@ -167,7 +167,8 @@ proc ::cac::<tmpl_var name="app">::whatis {args} {
   module-whatis "Manual: <tmpl_var name="manual_url">"
 }
 
-proc ::cac::<tmpl_var name="app">::whatis {args} {
+proc ::cac::<tmpl_var name="app">::load {app version modroot args} {
+
 }
 EOF
 }
