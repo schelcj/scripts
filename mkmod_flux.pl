@@ -8,10 +8,13 @@ use File::Spec;
 use File::Slurp qw(write_file);
 use autodie qw(:filesys);
 use Config::Tiny;
+use Carp qw(confess);
 
 Readonly::Scalar my $CAC_INCLUDES    => q{/home/software/systems/module-lib/cac-modules.tcl};
 Readonly::Scalar my $SPH_PATH        => q{/home/software/rhel6/sph};
 Readonly::Scalar my $MODULEFILE_PATH => qq{$SPH_PATH/Modules/modulefiles};
+Readonly::Scalar my $FILE_MODE       => oct('0664');
+Readonly::Scalar my $DIR_MODE        => oct('2775');
 
 ## no tidy
 my $opts = Getopt::Compact->new(
@@ -29,30 +32,37 @@ my $modulefile_dir     = get_modulefile_dir($opts->{app});
 my $modulefile_include = get_module_description($opts->{app});
 my %params             = get_params($opts->{app}, $opts->{version}, $modulefile_include);
 
-if ($opts->{config}) {
+if ($opts->{config} and not -e $opts->{config}) {
+  confess qq(Config defined '$opts->{config}' but does not exist);
+} elsif ($opts->{config}) {
   my $conf     = Config::Tiny->read($opts->{config});
   my $app_conf = $conf->{$opts->{app}};
 
   @params{keys %{$app_conf}} = values %{$app_conf};
+  say "Loaded desciptions and urls for $opts->{app}";
 }
 
 if (not -e $modulefile_dir) {
   mkdir($modulefile_dir);
+  chmod($DIR_MODE, $modulefile_dir);
   say "Created module directory $modulefile_dir";
 }
 
 my $modulefile = get_modulefile($modulefile_dir, $opts->{version});
 write_file($modulefile, get_modulefile_content());
+chmod $FILE_MODE, $modulefile;
 say "Wrote modulefile $modulefile";
 
 if ($opts->{include}) {
   write_file($modulefile_include, get_modulefile_include_content());
+  chmod $FILE_MODE, $modulefile_include;
   say "Wrote modulefile include $modulefile_include";
 }
 
 if ($opts->{default}) {
   my $default_version_file = File::Spec->join($modulefile_dir, '.version');
   write_file($default_version_file, get_default_version_content());
+  chmod $FILE_MODE, $default_version_file;
   say "Wrote default version file $default_version_file";
 }
 
