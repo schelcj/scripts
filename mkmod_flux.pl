@@ -1,9 +1,6 @@
 #!/usr/bin/env perl
 
-# TODO - get the whatis fields automated
-
 use Modern::Perl;
-use Data::Dumper;
 use HTML::Template;
 use Getopt::Compact;
 use Readonly;
@@ -21,15 +18,23 @@ my $opts = Getopt::Compact->new(
   struct => [
     [[qw(c config)],  q(Config file),               '=s'],
     [[qw(a app)],     q(Application Name),          '=s'],
-    [[qw(v version)], q(Version Number),            '=s'], 
-    [[qw(d default)], q(Set as default version)         ], 
+    [[qw(v version)], q(Version Number),            '=s'],
+    [[qw(d default)], q(Set as default version)         ],
     [[qw(i include)], q(Create include description file)],
   ]
 )->opts();
 ## use tidy
+
 my $modulefile_dir     = get_modulefile_dir($opts->{app});
 my $modulefile_include = get_module_description($opts->{app});
-my $params             = get_params($opts->{app}, $opts->{version}, $modulefile_include);
+my %params             = get_params($opts->{app}, $opts->{version}, $modulefile_include);
+
+if ($opts->{config}) {
+  my $conf     = Config::Tiny->read($opts->{config});
+  my $app_conf = $conf->{$opts->{app}};
+
+  @params{keys %{$app_conf}} = values %{$app_conf};
+}
 
 if (not -e $modulefile_dir) {
   mkdir($modulefile_dir);
@@ -74,13 +79,16 @@ sub get_module_description {
 
 sub get_params {
   my ($app, $version, $include) = @_;
-  return {
+  return (
     cac_includes       => $CAC_INCLUDES,
     app                => $app,
     version            => $version,
     modroot            => get_modroot($app, $version),
     module_description => $include,
-  };
+    description        => q{Not defined},
+    vendor_url         => q{Not defined},
+    manual_url         => q{Not defined},
+  );
 }
 
 sub get_modulefile_content {
@@ -98,7 +106,7 @@ sub get_default_version_content {
 sub get_content {
   my ($template) = @_;
   my $tmpl = HTML::Template->new(scalarref => \$template, die_on_bad_params => 0,);
-  $tmpl->param($params);
+  $tmpl->param(\%params);
   return $tmpl->output;
 }
 
@@ -137,13 +145,13 @@ namespace eval ::cac::<tmpl_var name="app"> {
 }
 
 proc ::cac::<tmpl_var name="app">::message {modroot version args} {
-  puts stderr "Description: Not defined"
+  puts stderr "Description: <tmpl_var name="description">"
 }
 
 proc ::cac::<tmpl_var name="app">::whatis {args} {
-  module-whatis "Description: Not defined"
-  module-whatis "Vendor Website: Not defined"
-  module-whatis "Manual: Not defined"
+  module-whatis "Description: <tmpl_var name="description">"
+  module-whatis "Vendor Website: <tmpl_var name="vendor_url">"
+  module-whatis "Manual: <tmpl_var name="manual_url">"
 }
 
 proc ::cac::<tmpl_var name="app">::whatis {args} {
