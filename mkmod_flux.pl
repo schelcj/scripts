@@ -155,7 +155,10 @@ namespace eval ::cac::<tmpl_var name="app"> {
 }
 
 proc ::cac::<tmpl_var name="app">::message {modroot version args} {
-  puts stderr "Description: <tmpl_var name="description">"
+  puts stderr "\t<tmpl_var name="description">"
+  puts stderr "\n\tThis adds $modroot/* to several of the"
+  puts stderr "\tenvironment variables."
+  puts stderr "\n\tVersion $version\n"
 }
 
 proc ::cac::<tmpl_var name="app">::whatis {args} {
