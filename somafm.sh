@@ -32,7 +32,9 @@ while true; do
       "doomed"         "Doomed"                 off \
       "brfm"           "Black Rock FM"          off \
       "sxfm"           "South by Soma"          off \
-      "sf1033"         "SF 10-33"               off 2> $tempfile 
+      "sf1033"         "SF 10-33"               off \
+      "xmasinfrisko"   "Xmas in Frisko"         off \
+      "christmas"      "Christmas Lounge"       off 2> $tempfile 
 
   test $? == 1 && exit
   station="$(cat $tempfile)"
