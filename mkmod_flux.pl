@@ -162,7 +162,7 @@ proc ::cac::<tmpl_var name="app">::message {modroot version args} {
 }
 
 proc ::cac::<tmpl_var name="app">::whatis {args} {
-  module-whatis "Description: <tmpl_var name="description">"
+  module-whatis "<tmpl_var name="description">"
   module-whatis "Vendor Website: <tmpl_var name="vendor_url">"
   module-whatis "Manual: <tmpl_var name="manual_url">"
 }
