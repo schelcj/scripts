@@ -39,5 +39,5 @@ while true; do
   test $? == 1 && exit
   station="$(cat $tempfile)"
   mplayer -quiet -vo none -ao sdl http://somafm.com/startstream=${station}.pls 2>&1 \
-    | dialog --progressbox 50 60
+    | dialog --progressbox 50 90
 done
