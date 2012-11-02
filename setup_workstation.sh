@@ -3,16 +3,10 @@
 # TODO - install various perl modules (perlcritic,ack,perltidy et al)
 
 function install_packages() {
-  sudo add-apt-repository ppa:vicox/syspeek
-  sudo add-apt-repository ppa:atareao/atareao
-  sudo add-apt-repository ppa:jaap.karssenberg/zim
-  sudo add-apt-repository ppa:ricotz/testing
   sudo apt-get update
-
   sudo apt-get remove gnome-screensaver
   sudo apt-get install \
     vim vim-gnome ctags \
-    gnome-do gnome-tweak-tool \
     xscreensaver \
     xscreensaver-data \
     xscreensaver-gl \
@@ -20,9 +14,8 @@ function install_packages() {
     xscreensaver-screensaver-bsod \
     xscreensaver-screensaver-dizzy \
     xscreensaver-screensaver-webcollage \
-    zim syspeek my-weather-indicator \
-    tmux most dstat iotop fluxbox htop nmap powertop wireshark scrot i3 \
-    traceroute git conky mc colortail \
+    tmux most dstat iotop htop nmap powertop wireshark scrot i3 \
+    traceroute git mc colortail \
     openvpn network-manager-openvpn \
     cifs-utils smbfs smbclient \
     libxml2-dev libexpat1-dev htmldoc \
@@ -55,6 +48,9 @@ function setup_homedir() {
   ln -s ~/Dropbox/dot-files/gvimrc ~/.gvimrc
   ln -s ~/Dropbox/dot-files/tmux.conf ~/.tmux.conf
   ln -s ~/Dropbox/dot-files/todo ~/.todo
+
+  echo "source ${HOME}/Dropbox/dot-files/bash/bashrc" >> ~/.bashrc
+  ln -s ${HOME}/.bashrc ${HOME}/.bash_profile
 }
 
 function setup_perl_env() {
@@ -69,18 +65,8 @@ function setup_perl_env() {
   cpanm App::perlfind
 }
 
-install_packages
-setup_homedir
-setup_wallpapers
-
-# fix gnome-terminal menubar bug in ubuntu
-sudo sed -i 's/export UBUNTU_MENU/echo ""; # export UBUNTU_MENU/g' /etc/X11/Xsession.d/80appmenu
-sudo sed -i 's/export UBUNTU_MENU/echo ""; # export UBUNTU_MENU/g' /etc/X11/Xsession.d/80appmenu-gtk
-
-# change the default path for the lastwallpaper to avoid dropbox traffic/popups
-sudo sed -i 's/lastwallpaper="${HOME}\/.fluxbox\/lastwallpaper"/lastwallpaper="${HOME}\/.wallpapers\/last"/g' $(which fbsetbg)
-
-echo "source ${HOME}/Dropbox/dot-files/bash/bashrc" >> ~/.bashrc
-ln -s ${HOME}/.bashrc ${HOME}/.bash_profile
-
-
+function fix_gnome_terminal() {
+  # fix gnome-terminal menubar bug in ubuntu
+  sudo sed -i 's/export UBUNTU_MENU/echo ""; # export UBUNTU_MENU/g' /etc/X11/Xsession.d/80appmenu
+  sudo sed -i 's/export UBUNTU_MENU/echo ""; # export UBUNTU_MENU/g' /etc/X11/Xsession.d/80appmenu-gtk
+}
