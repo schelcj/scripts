@@ -61,6 +61,28 @@ get '/queue' =>  sub {
   }
 };
 
+get '/job/:jobid' => sub {
+  my ($self) = @_;
+
+  my $slurm   = Slurm::new();
+  my $job_ref = $slurm->load_jobs();
+  my ($job)   = grep {$_->{job_id} == $self->param('jobid')} @{$job_ref->{job_array}};
+
+  given ($self->stash('format')) {
+    when (/json/) {
+      $self->render_json($job);
+    }
+    when (/txt/) {
+      $self->render_text(Dumper $job);
+    }
+    default {
+      $self->render();
+    }
+  }
+
+  return;
+};
+
 app->start;
 
 __DATA__
@@ -71,7 +93,9 @@ __DATA__
   <head>
     <title>Biostat Cluster Job Queue</title>
     <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" type="text/css" media="all" /> 
     <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.9/jquery-ui.min.js"></script>
     <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
 
     <script type="text/javascript">
@@ -81,7 +105,7 @@ __DATA__
             bAutoWidth:  false,
             bProcessing: true,
             bDestroy:    true,
-            iDisplayLength: 50,
+            iDisplayLength: 25,
             sAjaxSource: '/queue.json',
             aoColumns: [
               { sTitle: 'Jobid'            },
@@ -93,7 +117,18 @@ __DATA__
               { sTitle: 'Timelimit'        },
               { sTitle: 'Nodes'            },
               { sTitle: 'Nodelist(Reason)' },
-            ]
+            ],
+            aoColumnDefs: [{
+              aTargets: ['_all'],
+              fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
+                if (iCol == 0) {
+                  $('<a />', {href: '/job/' + sData, text: sData}).click(function() {
+                    $.getJSON({url: $(this).attr('href'), data: job_data});
+                    $('<div />', {id: '_' + sData, text: job_data}).dialog();
+                  }).appendTo($(nTd).empty());
+                }
+              }
+            }],
           });
         });
       })(jQuery)};
