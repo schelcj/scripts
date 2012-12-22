@@ -14,12 +14,12 @@ function install_packages() {
     xscreensaver-screensaver-bsod \
     xscreensaver-screensaver-dizzy \
     xscreensaver-screensaver-webcollage \
-    tmux most dstat iotop htop nmap powertop wireshark scrot i3 \
+    tmux most dstat iotop htop nmap powertop wireshark scrot i3 nethogs \
     traceroute git mc colortail \
     openvpn network-manager-openvpn \
     cifs-utils smbfs smbclient \
     libxml2-dev libexpat1-dev htmldoc \
-    network-manager-vpnc
+    network-manager-vpnc python-setuptools mercurial
 }
 
 function setup_wallpapers() {
