@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use local::lib qq($ENV{HOME}/perl5);
+use local::lib;
 use Modern::Perl;
 use Carp qw(confess);
 use Readonly;
@@ -10,8 +10,11 @@ use File::Slurp qw(read_file write_file append_file);
 use Getopt::Compact;
 use Data::Dumper;
 use File::Find::Object;
+use File::Flock::Tiny;
+use Proc::Daemon;
 
 Readonly::Scalar my $PREFIX           => qq($ENV{HOME}/.wallpapers);
+Readonly::Scalar my $TMPDIR           => qq($ENV{HOME}/tmp);
 Readonly::Scalar my $LOCK             => qq{$PREFIX/lock};
 Readonly::Scalar my $HISTORY          => qq{$PREFIX/history};
 Readonly::Scalar my $CATEGORY         => qq{$PREFIX/category};
@@ -21,6 +24,8 @@ Readonly::Scalar my $RESOLUTION       => qq{$PREFIX/resolution};
 Readonly::Scalar my $PREVIOUS         => qq{$PREFIX/previous};
 Readonly::Scalar my $LOG              => qq{$PREFIX/log};
 Readonly::Scalar my $SOURCES          => qq{$PREFIX/sources};
+Readonly::Scalar my $PIDFILE          => qq{$PREFIX/wallpaper.pid};
+Readonly::Scalar my $SLEEP_INTERVAL   => 60*60;
 Readonly::Scalar my $BGSETTER         => q{fbsetbg};
 Readonly::Scalar my $BGSETTER_OPTS    => q{-a};
 Readonly::Scalar my $SLASH            => q{/};
@@ -29,18 +34,20 @@ Readonly::Scalar my $DEFAULT_CATEGORY => q{all};
 ## no tidy
 my $opts = Getopt::Compact->new(
   struct => [
-    [[qw(c category)],    q(Wallpaper category),          ':s'],
-    [[qw(r resolution)],  q(Wallpaper resolution),        ':s'],
-    [[qw(f flush-cache)], q(Flush the wallpaper cache)        ],
-    [[qw(d dump-cache)],  q(Dump the wallpaper cache)         ],
-    [[qw(l lock)],        q(Lock the current paper)           ],
-    [[qw(u unlock)],      q(Unlock the current paper)         ],
-    [[qw(clear)],         q(Clear previous category/resoution)],
-    [[qw(p previous)],    q(Set wallpaper to previous paper)  ],
+    [[qw(c category)],    q(Wallpaper category),                                ':s'],
+    [[qw(r resolution)],  q(Wallpaper resolution),                              ':s'],
+    [[qw(f flush-cache)], q(Flush the wallpaper cache)                              ],
+    [[qw(d dump-cache)],  q(Dump the wallpaper cache)                               ],
+    [[qw(l lock)],        q(Lock the current paper)                                 ],
+    [[qw(u unlock)],      q(Unlock the current paper)                               ],
+    [[qw(clear)],         q(Clear previous category/resoution)                      ],
+    [[qw(p previous)],    q(Set wallpaper to previous paper)                        ],
+    [[qw(s sleep)],       q(How long to sleep, in seconds, if run as a daemon), ':i'],
+    [[qw(D daemon)],      q(Background process for a slide show effect)             ],
+    [[qw(stop)],          q(Stop a running daemon)                                  ],
   ]
 )->opts();
 ## end no tidy
-
 
 exit if -e $LOCK and not $opts->{unlock};
 
@@ -86,21 +93,50 @@ if ($opts->{previous}) {
   exit;
 }
 
-my @wallpaper_dirs = get_wallpaper_dirs();
-my @wallpapers     = get_wallpapers(@wallpaper_dirs);
-my $rv             = _set();
+if ($opts->{stop}) {
+  my $pid = read_file($PIDFILE);
+  kill 9, $pid;
+  unlink $PIDFILE;
+  exit;
+}
 
-exit $rv;
+# TODO - this isn't working as i want
+my $lock = File::Flock::Tiny->write_pid($PIDFILE) or die q{Another wallpaper.pl process is running};
+
+if ($opts->{daemon}) {
+    my $daemon = Proc::Daemon->new(work_dir => $TMPDIR);
+    my $pid    = $daemon->Init;
+
+    if (not $pid) {
+      while (1) {
+        set(); 
+        sleep($opts->{sleep}||$SLEEP_INTERVAL);
+      }
+    }
+
+    $daemon->Kill_Daemon();
+} else {
+  set();
+}
+
+$lock->release();
+
+sub set {
+    my @wallpaper_dirs = get_wallpaper_dirs();
+    my @wallpapers     = get_wallpapers(@wallpaper_dirs);
+    return _set(\@wallpapers);
+}
 
 sub _set {
+  my ($papers)  = @_;
   my $rc        = 0;
   my $set_paper = 0;
 
-  if (scalar @wallpapers == 1) {
-    $rc = set_wallpaper($wallpapers[0]);
+  if (scalar @{$papers} == 1) {
+    $rc = set_wallpaper($papers->[0]);
     $set_paper = 1;
   } else {
-    while (my $paper = get_random_wallpaper(\@wallpapers)) {
+    while (my $paper = get_random_wallpaper($papers)) {
       next if is_cached($paper);
       $rc = set_wallpaper($paper);
       $set_paper = 1;
@@ -114,7 +150,7 @@ sub _set {
     return $rc;
   }
 
-  return _set();
+  return _set($papers);
 }
 
 sub _build_path {

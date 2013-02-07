@@ -34,9 +34,13 @@ while true; do
       "doomed"         "Doomed"                 off \
       "brfm"           "Black Rock FM"          off \
       "sxfm"           "South by Soma"          off \
-      "sf1033"         "SF 10-33"               off 2> $tempfile 
+      "sf1033"         "SF 10-33"               off \
+      "xmasinfrisko"   "Xmas in Frisko"         off \
+      "christmas"      "Christmas Lounge"       off \
+      "xmasrocks"      "Christmas Rocks!"       off 2> $tempfile
 
   test $? == 1 && exit
   station="$(cat $tempfile)"
-  mplayer -vo none -ao sdl http://somafm.com/startstream=${station}.pls
+  mplayer -quiet -vo none -ao sdl http://somafm.com/startstream=${station}.pls 2>&1 \
+    | dialog --progressbox 50 90
 done
