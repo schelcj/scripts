@@ -12,6 +12,9 @@ case "$1" in
   'low')
     echo 0 > $dev
     ;;
+  'set')
+    echo $2 > $dev
+    ;;
   'status')
     cat $dev
     ;;

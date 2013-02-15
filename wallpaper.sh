@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 while true; do
   source $(dirname $0)/set_wallpaper.sh
