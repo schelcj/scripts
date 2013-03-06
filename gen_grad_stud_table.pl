@@ -51,12 +51,10 @@ sub get_params {
   for my $student (keys %{$student_ref}) {
     my $title = join(q{ }, uniq @{$student_ref->{$student}{titles}});
     ($title = autoformat($title, {case => 'highlight'}) || q{}) =~ s/[\n\r]+//g;
-    (my $name = autoformat($student, {case => 'highlight'})) =~ s/[\n\r]+//g;
-    my $committee = join(q{ and }, uniq @{$student_ref->{$student}{committee_members}});
 
     push @{$param_ref->{students}}, {
-      name      => $name,
-      committee => $committee,
+      name      => reverseName(cleanName($student)),
+      committee =>  join(q{ and }, uniq @{$student_ref->{$student}{committee_members}}),
       year      => $student_ref->{$student}{year},
       title     => $title,
       };
