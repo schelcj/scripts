@@ -52,9 +52,17 @@ sub get_params {
     my $title = join(q{ }, uniq @{$student_ref->{$student}{titles}});
     ($title = autoformat($title, {case => 'highlight'}) || q{}) =~ s/[\n\r]+//g;
 
+    my $committee;
+    my @members = uniq @{$student_ref->{$student}{committee_members}};
+    given (scalar @members) {
+      when ($_ >= 3) {$committee = join(q{, and }, @members)}
+      when ($_ >= 2) {$committee = join(q{ and },  @members)}
+      default        {$committee = join(q{},       @members)}
+    }
+
     push @{$param_ref->{students}}, {
       name      => reverseName(cleanName($student)),
-      committee =>  join(q{ and }, uniq @{$student_ref->{$student}{committee_members}}),
+      committee => $committee,
       year      => $student_ref->{$student}{year},
       title     => $title,
       };
