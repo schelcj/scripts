@@ -5,6 +5,7 @@ use Class::CSV;
 use List::MoreUtils qw(all uniq);
 use Text::Autoformat;
 use HTML::Template;
+use Text::Names qw(reverseName cleanName);
 
 my %students = get_students($ARGV[0]);
 my %params   = get_params(\%students);
@@ -28,7 +29,7 @@ sub get_students {
 
   for my $line (@lines) {
     next if $line->role !~ /coch|chai/i;
-    push @{$student_ref->{$line->name}{committee_members}}, $line->committee_member;
+    push @{$student_ref->{$line->name}{committee_members}}, reverseName(cleanName($line->committee_member));
     $student_ref->{$line->name}{titles} = [];
 
     if ($line->title !~ /^\s*$/) {
@@ -49,12 +50,9 @@ sub get_params {
 
   for my $student (keys %{$student_ref}) {
     my $title = join(q{ }, uniq @{$student_ref->{$student}{titles}});
-
     ($title = autoformat($title, {case => 'highlight'}) || q{}) =~ s/[\n\r]+//g;
     (my $name = autoformat($student, {case => 'highlight'})) =~ s/[\n\r]+//g;
-
-    my $committee = join(q{ }, uniq @{$student_ref->{$student}{committee_members}});
-    ($committee = autoformat($committee, {case => 'highlight'})) =~ s/[\n\r]+//g;
+    my $committee = join(q{ and }, uniq @{$student_ref->{$student}{committee_members}});
 
     push @{$param_ref->{students}}, {
       name      => $name,
