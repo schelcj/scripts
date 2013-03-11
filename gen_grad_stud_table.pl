@@ -29,7 +29,10 @@ sub get_students {
 
   for my $line (@lines) {
     next if $line->role !~ /coch|chai/i;
-    push @{$student_ref->{$line->name}{committee_members}}, reverseName(cleanName($line->committee_member));
+    if ($line->committee_member) {
+      push @{$student_ref->{$line->name}{committee_members}}, reverseName(cleanName($line->committee_member));
+    }
+
     $student_ref->{$line->name}{titles} = [];
 
     if ($line->title !~ /^\s*$/) {
