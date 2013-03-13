@@ -1,26 +1,28 @@
 #!/usr/bin/env perl
 
+## no critic (ProhibitVoidMap,ProhibitMagicNumbers)
+
 use Modern::Perl;
 use Class::CSV;
-use List::MoreUtils qw(all uniq);
+use List::MoreUtils qw(all none uniq);
 use Text::Autoformat;
 use HTML::Template;
 use Text::Names qw(reverseName cleanName);
 use File::Slurp qw(write_file);
 
-my %students = get_students($ARGV[0]);
-my %params   = get_params(\%students);
-my $template = get_template();
-my $tmpl     = HTML::Template->new(scalarref => \$template, die_on_bad_params => 0);
-my @headers  = (qw(name committee year title));
-my $csv      = Class::CSV->new(fields => \@headers);
+my %students   = get_students($ARGV[0]);
+my %params     = get_params(\%students);
+my $template   = get_template();
+my $tmpl       = HTML::Template->new(scalarref => \$template, die_on_bad_params => 0);
+my @headers    = (qw(name committee year title));
+my $output_csv = Class::CSV->new(fields => \@headers);
 
 $tmpl->param(\%params);
 write_file('dissertations.shtml', $tmpl->output);
 
-$csv->add_line({map {$_ => $_} @headers});
-map {$csv->add_line($_)} sort {$a->{year} <=> $b->{year}} @{$params{students}};
-write_file('dissertations.csv', $csv->string());
+$output_csv->add_line({map {$_ => $_} @headers});
+map {$output_csv->add_line($_)} sort {$a->{year} <=> $b->{year}} @{$params{students}};
+write_file('dissertations.csv', $output_csv->string());
 
 sub get_students {
   my ($file)      = @_;
@@ -36,19 +38,25 @@ sub get_students {
 
   for my $line (@lines) {
     next if $line->role !~ /coch|chai/i;
+
+    my $name = reverseName(cleanName($line->name));
+
     if ($line->committee_member) {
-      push @{$student_ref->{$line->name}{committee_members}}, reverseName(cleanName($line->committee_member));
+      my $committee_member = reverseName(cleanName($line->committee_member));
+      if (none {$_ eq $committee_member} @{$student_ref->{$name}{committee_members}}) {
+        push @{$student_ref->{$name}{committee_members}}, $committee_member;
+      }
     }
 
-    $student_ref->{$line->name}{titles} = [];
+    $student_ref->{$name}{titles} = [];
 
     if ($line->title !~ /^\s*$/) {
       my $title = $line->title;
       chomp($title);
-      push @{$student_ref->{$line->name}{titles}}, $title;
+      push @{$student_ref->{$name}{titles}}, $title;
     }
 
-    ($student_ref->{$line->name}{year} = $line->term) =~ s/\D//g;
+    ($student_ref->{$name}{year} = $line->term) =~ s/\D//g;
   }
 
   return %{$student_ref};
