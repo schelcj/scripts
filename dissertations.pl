@@ -6,14 +6,21 @@ use List::MoreUtils qw(all uniq);
 use Text::Autoformat;
 use HTML::Template;
 use Text::Names qw(reverseName cleanName);
+use File::Slurp qw(write_file);
 
 my %students = get_students($ARGV[0]);
 my %params   = get_params(\%students);
 my $template = get_template();
 my $tmpl     = HTML::Template->new(scalarref => \$template, die_on_bad_params => 0);
+my @headers  = (qw(name committee year title));
+my $csv      = Class::CSV->new(fields => \@headers);
 
 $tmpl->param(\%params);
-print $tmpl->output;
+write_file('dissertations.shtml', $tmpl->output);
+
+$csv->add_line({map {$_ => $_} @headers});
+map {$csv->add_line($_)} sort {$a->{year} <=> $b->{year}} @{$params{students}};
+write_file('dissertations.csv', $csv->string());
 
 sub get_students {
   my ($file)      = @_;
