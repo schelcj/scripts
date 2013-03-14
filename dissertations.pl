@@ -7,7 +7,7 @@ use Class::CSV;
 use List::MoreUtils qw(all none uniq);
 use Text::Autoformat;
 use HTML::Template;
-use Text::Names qw(reverseName cleanName);
+use Text::Names qw(reverseName cleanName samePerson);
 use File::Slurp qw(write_file);
 
 my %students   = get_students($ARGV[0]);
@@ -43,7 +43,11 @@ sub get_students {
 
     if ($line->committee_member) {
       my $committee_member = reverseName(cleanName($line->committee_member));
-      if (none {$_ eq $committee_member} @{$student_ref->{$name}{committee_members}}) {
+      if (
+        none {$_ eq $committee_member} @{$student_ref->{$name}{committee_members}}
+          and
+        none {samePerson($_, $committee_member)} @{$student_ref->{$name}{committee_members}}
+      ) {
         push @{$student_ref->{$name}{committee_members}}, $committee_member;
       }
     }
