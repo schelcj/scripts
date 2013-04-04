@@ -6,6 +6,7 @@ tmux has-session -t music 2>&1 > /dev/null
 if [ $? -ne 0 ]; then
   tmux new-session -d -s music -n somafm
   tmux new-window -a -d -n pandora
+  tmux new-window -a -d -n ressik
   tmux new-window -a -d -n subsonic
 fi
 
