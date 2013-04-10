@@ -137,8 +137,6 @@ set include <tmpl_var name="include">
 
 conflict <tmpl_var name="app">
 
-prepend-path PATH $modroot/bin
-
 cac::whatis $app                                                                              
 if { [ info exists NewModulesVersionDate ] == 1 } {                                           
   cac::load $app $version $modroot $ModulesVersion $NewModulesVersion $NewModulesVersionDate
