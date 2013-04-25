@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# dialog html-xml-utils mplayer
-
 tempfile=$(tempfile 2>/dev/null) || tempfile=/tmp/test$$
 trap "rm -f $tempfile" 0 1 2 5 15
 
@@ -37,7 +35,9 @@ while true; do
       "sf1033"         "SF 10-33"               off \
       "xmasinfrisko"   "Xmas in Frisko"         off \
       "christmas"      "Christmas Lounge"       off \
-      "xmasrocks"      "Christmas Rocks!"       off 2> $tempfile
+      "xmasrocks"      "Christmas Rocks!"       off \
+      "bagel"          "BAGel Radio"            off \
+      "folkfwd"        "Fold Forward"           off 2> $tempfile
 
   test $? == 1 && exit
   station="$(cat $tempfile)"
