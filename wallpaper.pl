@@ -44,6 +44,7 @@ my $opts = Getopt::Compact->new(
     [[qw(s sleep)],       q(How long to sleep, in seconds, if run as a daemon), ':i'],
     [[qw(D daemon)],      q(Background process for a slide show effect)             ],
     [[qw(stop)],          q(Stop a running daemon)                                  ],
+    [[qw(i image)],       q(Set image as wallpaper),                            ':s'],
   ]
 )->opts();
 ## end no tidy
@@ -96,6 +97,11 @@ if ($opts->{stop}) {
   my $pid = read_file($PIDFILE);
   kill 9, $pid;
   unlink $PIDFILE;
+  exit;
+}
+
+if ($opts->{image}) {
+  set_wallpaper($opts->{image});
   exit;
 }
 
