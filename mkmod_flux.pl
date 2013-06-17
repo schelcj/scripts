@@ -3,18 +3,16 @@
 use Modern::Perl;
 use HTML::Template;
 use Getopt::Compact;
-use Readonly;
 use File::Spec;
 use File::Slurp qw(write_file);
 use autodie qw(:filesys);
 use Config::Tiny;
-use Carp qw(confess);
 
-Readonly::Scalar my $CAC_INCLUDES    => q{/home/software/systems/module-lib/cac-modules.tcl};
-Readonly::Scalar my $SPH_PATH        => q{/home/software/rhel6/sph};
-Readonly::Scalar my $MODULEFILE_PATH => qq{$SPH_PATH/Modules/modulefiles};
-Readonly::Scalar my $FILE_MODE       => oct('0664');
-Readonly::Scalar my $DIR_MODE        => oct('2775');
+my $CAC_INCLUDES    = q{/home/software/systems/module-lib/cac-modules.tcl};
+my $SPH_PATH        = q{/home/software/rhel6/sph};
+my $MODULEFILE_PATH = qq{$SPH_PATH/Modules/modulefiles};
+my $FILE_MODE       = oct('0664');
+my $DIR_MODE        = oct('2775');
 
 ## no tidy
 my $opts = Getopt::Compact->new(
@@ -33,7 +31,7 @@ my $modulefile_include = get_module_description($opts->{app});
 my %params             = get_params($opts->{app}, $opts->{version}, $modulefile_include);
 
 if ($opts->{config} and not -e $opts->{config}) {
-  confess qq(Config defined '$opts->{config}' but does not exist);
+  die qq(Config defined '$opts->{config}' but does not exist);
 } elsif ($opts->{config}) {
   my $conf     = Config::Tiny->read($opts->{config});
   my $app_conf = $conf->{$opts->{app}};
@@ -98,6 +96,7 @@ sub get_params {
     description        => q{Not defined},
     vendor_url         => q{Not defined},
     manual_url         => q{Not defined},
+    include            => File::Spec->join($MODULEFILE_PATH, $app, 'include.tcl'),
   );
 }
 
@@ -134,10 +133,9 @@ proc ModulesHelp { } {
 set version <tmpl_var name="version">
 set app     <tmpl_var name="app">
 set modroot <tmpl_var name="modroot">
+set include <tmpl_var name="include">
 
 conflict <tmpl_var name="app">
-
-prepend-path PATH $modroot/bin
 
 cac::whatis $app                                                                              
 if { [ info exists NewModulesVersionDate ] == 1 } {                                           
@@ -145,6 +143,10 @@ if { [ info exists NewModulesVersionDate ] == 1 } {
 } else {                                                                                      
   cac::load $app $version $modroot                                                          
 }                                                                                             
+
+if { [ file exists $include ] } {
+  source $include
+}
 EOF
 }
 
