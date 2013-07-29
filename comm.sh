@@ -6,7 +6,7 @@ tmux has-session -t comm 2>&1 > /dev/null
 if [ $? -ne 0 ]; then
   tmux new-session -d -s comm
 
-  tmux new-window -a -d -n irssi irssi
+  tmux new-window -a -d -n weechat weechat-curses
   tmux new-window -a -d -n wyrd wyrd
   tmux new-window -a -d -n slrn slrn
   tmux new-window -a -d -n mutt mutt
@@ -17,7 +17,7 @@ if [ $? -ne 0 ]; then
   # tmux set-option status off
 
   tmux join-pane -t comm:mutt -s comm:wyrd
-  tmux join-pane -t comm:mutt -s comm:irssi
+  tmux join-pane -t comm:mutt -s comm:weechat
   tmux join-pane -t comm:mutt -s comm:slrn
 
   tmux select-layout tiled
