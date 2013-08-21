@@ -1,2 +1,2 @@
 #!/bin/sh
-xdg-open "https://www.google.com/search?q=$1"
+xdg-open "https://www.google.com/search?q=$*"
