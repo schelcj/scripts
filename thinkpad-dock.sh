@@ -1,5 +1,32 @@
 #!/bin/sh
 
+# According to http://phihag.de/2012/thinkpad-docking.html
+# the following acpi events need to be added to make
+# this work.
+#
+# cat >/etc/acpi/events/thinkpad-dock-ibm <<EOF
+# event=ibm/hotkey IBM0068:00 00000080 00004010
+# action=su $SUDO_USER -c /etc/acpi/thinkpad-dock.sh
+# EOF
+#
+# cat >/etc/acpi/events/thinkpad-dock-lenovo <<EOF
+# event=ibm/hotkey LEN0068:00 00000080 00004010
+# action=su $SUDO_USER -c /etc/acpi/thinkpad-dock.sh
+# EOF
+#
+# cat >/etc/acpi/events/thinkpad-undock-ibm <<EOF
+# event=ibm/hotkey IBM0068:00 00000080 00004011
+# action=su $SUDO_USER -c /etc/acpi/thinkpad-undock.sh
+# EOF
+#
+# cat >/etc/acpi/events/thinkpad-undock-lenovo <<EOF
+# event=ibm/hotkey LEN0068:00 00000080 00004011
+# action=su $SUDO_USER -c /etc/acpi/thinkpad-undock.sh
+# EOF
+#
+
+sleep 2
+
 export PATH=${HOME}/scripts:${HOME}/bin:${PATH}
 
 function dock() {
@@ -17,15 +44,8 @@ function dock() {
 function undock() {
   logger "undocking event called from $0"
 
-  test -f /usr/share/acpi-support/key-constants || exit 0
-
-  for device in /sys/devices/platform/dock.*; do
-    [ -e "$device/type" ] || continue
-    [ x$(cat "$device/type") = xdock_station ] || continue
-    echo 1 > "$device/undock"
-  done
-
   #xrandr -d :0.0 --output LVDS1 --auto --primary --mode 1600x900 --output VGA1 --off
+
   for output in $(xrandr -d :0.0 --verbose|grep " connected"|grep -v LVDS|awk '{print $1}'); do
     xrandr -d :0.0 --output $output --off
   done
@@ -36,18 +56,11 @@ function undock() {
   amixer set Master mute
 }
 
-Dfunction turn_off_displays() {
-}
-
-OCKED=$(cat /sys/devices/platform/dock.1/docked)
-
-sleep 0.5
-
-case "$DOCKED" in
-  0)
+case "$(basename $0)" in
+  "thinkpad-undock.sh")
     undock
     ;;
-  1)
+  "thinkpad-dock.sh")
     dock
     ;;
 esac
