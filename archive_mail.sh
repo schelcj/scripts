@@ -1,13 +1,15 @@
-#!/bin/bash -l
+#!/bin/bash
 
-module load python
-module load offlineimap
-module load getmail
+ACCOUNTS=(pobox umich)
 
-ACCOUNTS=(Pobox Umich)
-
-for account in "${ACCOUNTS[@]}"; do
-  getmail --rcfile getmailrc-$(echo $account|tr '[A-Z]' '[a-z')
+for acct in "${ACCOUNTS[@]}"; do
+  getmail --rcfile getmailrc-${acct}
+  mairix -F -f ~/Dropbox/dot-files/mairix/mairixrc-${acct}
 done
 
-/usr/local/bin/mairix -F
+# mairix -F
+# pidof mairix 
+# if [ $? -eq "1" ]; then
+#   lock_file="${HOME}/.mairix.db.lock"
+#   test -e $lock_file && rm -v $lock_file
+# fi
