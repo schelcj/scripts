@@ -9,6 +9,7 @@ while true; do
     --title "Select a station to listen to" \
     --clear \
     --radiolist "Select a station to listen to" 20 60 24 \
+      "deepspaceone"   "Deep Space One"         off \
       "groovesalad"    "Groove Salad"           off \
       "lush"           "Lush"                   off \
       "dronezone"      "Drone Zone"             off \
