@@ -4,7 +4,7 @@ ACCOUNTS=(pobox umich)
 
 for acct in "${ACCOUNTS[@]}"; do
   getmail --rcfile getmailrc-${acct}
-  mairix -F -f ~/Dropbox/dot-files/mairix/mairixrc-${acct}
+  mairix -F -f ~/.mairixrc-${acct}
 done
 
 # mairix -F
