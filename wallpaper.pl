@@ -19,7 +19,6 @@ my $HISTORY          = qq{$PREFIX/history};
 my $CATEGORY         = qq{$PREFIX/category};
 my $WALLPAPER_DIR    = qq{$PREFIX/Wallpapers};
 my $CURRENT          = qq{$PREFIX/current};
-my $RESOLUTION       = qq{$PREFIX/resolution};
 my $PREVIOUS         = qq{$PREFIX/previous};
 my $LOG              = qq{$PREFIX/log};
 my $SOURCES          = qq{$PREFIX/sources};
@@ -34,12 +33,11 @@ my $DEFAULT_CATEGORY = q{all};
 my $opts = Getopt::Compact->new(
   struct => [
     [[qw(c category)],    q(Wallpaper category),                                ':s'],
-    [[qw(r resolution)],  q(Wallpaper resolution),                              ':s'],
     [[qw(f flush-cache)], q(Flush the wallpaper cache)                              ],
     [[qw(d dump-cache)],  q(Dump the wallpaper cache)                               ],
     [[qw(l lock)],        q(Lock the current paper)                                 ],
     [[qw(u unlock)],      q(Unlock the current paper)                               ],
-    [[qw(clear)],         q(Clear previous category/resoution)                      ],
+    [[qw(clear)],         q(Clear previous category)                                ],
     [[qw(p previous)],    q(Set wallpaper to previous paper)                        ],
     [[qw(s sleep)],       q(How long to sleep, in seconds, if run as a daemon), ':i'],
     [[qw(D daemon)],      q(Background process for a slide show effect)             ],
@@ -56,15 +54,10 @@ tie %history, 'DB_File', $HISTORY; ## no critic (ProhibitTies)
 
 if ($opts->{clear}) {
   unlink $CATEGORY;
-  unlink $RESOLUTION;
 }
 
 if ($opts->{category}) {
   write_file($CATEGORY, $opts->{category});
-}
-
-if ($opts->{resolution} and $opts->{category}) {
-  write_file($RESOLUTION,$opts->{resolution});
 }
 
 if ($opts->{'flush-cache'}) {
@@ -168,7 +161,6 @@ sub _build_path {
 sub get_wallpaper_dirs {
   my @paths = ();
   my $category = get_category();
-  my $resolution = get_resolution();
 
   if ($category eq $DEFAULT_CATEGORY) {
     return map {_build_path($_)} read_file($SOURCES);
@@ -177,10 +169,6 @@ sub get_wallpaper_dirs {
   }
 
   push @paths, $category;
-
-  if (defined $resolution) {
-    push @paths, $resolution;
-  }
 
   my $dir = join($SLASH, @paths);
   confess qq{Wallpaper directory ($dir) does not exist} if not -e $dir;
@@ -242,10 +230,6 @@ sub set_current {
 
 sub get_category {
   return (-e $CATEGORY) ? read_file($CATEGORY) : $DEFAULT_CATEGORY;
-}
-
-sub get_resolution {
-  return (-e $RESOLUTION) ? read_file($RESOLUTION) : undef;
 }
 
 sub get_bgsetter {
