@@ -115,7 +115,9 @@ if ($opts->{daemon}) {
 
     $daemon->Kill_Daemon();
 } else {
-  set();
+  if (not -e $LOCK) {
+    set();
+  }
 }
 
 $lock->release();
