@@ -108,16 +108,14 @@ if ($opts->{daemon}) {
 
     if (not $pid) {
       while (1) {
-        set(); 
+        set() if not -e $LOCK;
         sleep($opts->{sleep}||$SLEEP_INTERVAL);
       }
     }
 
     $daemon->Kill_Daemon();
 } else {
-  if (not -e $LOCK) {
-    set();
-  }
+  set();
 }
 
 $lock->release();
