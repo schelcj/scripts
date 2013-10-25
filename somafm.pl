@@ -14,6 +14,7 @@ my $title              = q{Select a station to listen to};
 my $radiolist_title    = q{Select a station to listen to};
 my $dialog_geom        = q{20 60};
 my $dialog_list_height = q{24};
+my @stations           = get_stations();
 
 while (1) {
   play(get_station_selection());
@@ -50,7 +51,7 @@ sub build_station_selection_dialog {
      $cmd .= qq{--title "$title" --clear --radiolist };
      $cmd .= qq{"$radiolist_title" $dialog_geom $dialog_list_height };
 
-  map {$cmd .= qq{"$_->[1]" "$_->[0]" off }} get_stations();
+  map {$cmd .= qq{"$_->[1]" "$_->[0]" off }} @stations;
 
   return qq{$cmd 2> $temp_file};
 }
