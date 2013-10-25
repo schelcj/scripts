@@ -68,5 +68,5 @@ sub get_stations {
     }
   );
 
-  return sort {lc($a->[0]) cmp lc($b->[0])} @stations;
+  return @stations;
 }
