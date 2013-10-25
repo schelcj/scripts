@@ -15,7 +15,7 @@ my $dialog_geom        = q{20 60};
 my $dialog_list_height = q{24};
 my $somafm_url         = q{http://somafm.com};
 my $somafm_stream_url  = qq{$somafm_url/startstream=%s.pls};
-my $mplayer_cmd        = qq{mplayer -quiet -vo none -ao sdl %s 2>&1 | dialog --progressbox $dialog_geom};
+my $mplayer_cmd_fmt    = qq{mplayer -quiet -vo none -ao sdl %s 2>&1 | dialog --progressbox $dialog_geom};
 
 while (1) {
   play(get_station_selection());
@@ -24,9 +24,10 @@ while (1) {
 sub play {
   my ($station)   = @_;
   my $url         = sprintf $somafm_stream_url, $station;
-  my $mplayer_cmd = sprintf $mplayer_cmd, $url;
+  my $mplayer_cmd = sprintf $mplayer_cmd_fmt, $url;
 
   run($mplayer_cmd);
+  return;
 }
 
 sub get_station_selection {
@@ -61,10 +62,10 @@ sub get_stations {
   $dom->find('li.cbshort')->each(
     sub {
       my $node = shift;
-      (my $name = $node->at('a:first-child')->attrs('href')) =~ s/\///g;
-      my $title = $node->at('h3')->text();
+      (my $station_name = $node->at('a:first-child')->attrs('href')) =~ s/\///g;
+      my $station_title = $node->at('h3')->text();
 
-      push @stations, [$title, $name];
+      push @stations, [$station_title, $station_name];
     }
   );
 
