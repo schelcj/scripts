@@ -24,7 +24,7 @@ sub play {
   my ($station) = @_;
 
   my $url         = sprintf qq{$somafm_url/startstream=%s.pls}, $station;
-  my $mplayer_cmd = sprintf q{mplayer -quiet -vo none -ao sdl %s 2>&1}, $url;
+  my $mplayer_cmd = sprintf q{mplayer -quiet -vo none -ao sdl -input file=/tmp/mplayer %s 2>&1}, $url;
 
   run(qq{$mplayer_cmd | dialog --progressbox $dialog_geom});
 
