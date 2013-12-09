@@ -9,6 +9,6 @@ done < <(grep -e '^\(title\|artist\|album\|stationName\|songStationName\|pRet\|p
 
 case "$1" in
   'songstart')
-    notify-send -u low "$title" "by $artist"
+    notify-send -u low "Pandora" "$title\nby $artist\non $songStationName"
     ;;
 esac
