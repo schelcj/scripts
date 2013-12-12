@@ -64,7 +64,7 @@ sub get_stations {
   $dom->find('li.cbshort')->each(
     sub {
       my $node = shift;
-      (my $station_name = $node->at('a:first-child')->attrs('href')) =~ s/\///g;
+      (my $station_name = $node->at('a:first-child')->attr('href')) =~ s/\///g;
       my $station_title = $node->at('h3')->text();
 
       push @stations, [$station_title, $station_name];
