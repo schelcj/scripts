@@ -4,13 +4,13 @@ use local::lib;
 use Modern::Perl;
 use Carp qw(confess);
 use DB_File;
-use System::Command;
 use File::Slurp qw(read_file write_file append_file);
 use Getopt::Compact;
 use Data::Dumper;
 use File::Find::Object;
 use File::Flock::Tiny;
 use Proc::Daemon;
+use IPC::System::Simple qw(capture);
 
 my $PREFIX           = qq($ENV{HOME}/.wallpapers);
 my $TMPDIR           = qq($ENV{HOME}/tmp);
@@ -201,24 +201,13 @@ sub get_random_wallpaper {
 sub set_wallpaper {
   my ($paper) = @_;
 
-  my $cmd_str = sprintf q{%s '%s'}, get_bgsetter(), $paper;
-  my $cmd     = System::Command->new($cmd_str);
-  my $stdout  = $cmd->stdout();
-  my $stderr  = $cmd->stderr();
+  my $cmd_str = sprintf q{%s %s}, get_bgsetter(), $paper;
+  my $rv      = capture($cmd_str);
 
-  while (<$stdout>) {
-    append_file($LOG, $_);
-  }
-
-  while (<$stderr>) {
-    append_file($LOG, $_);
-  }
-
-  $cmd->close();
   cache($paper);
   set_current($paper);
 
-  return $cmd->exit();
+  return $rv;
 }
 
 sub set_current {
