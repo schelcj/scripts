@@ -9,6 +9,7 @@ while true; do
     --title "Select a station to listen to" \
     --clear \
     --radiolist "Select a station to listen to" 20 60 24 \
+      "deepspaceone"   "Deep Space One"         off \
       "groovesalad"    "Groove Salad"           off \
       "lush"           "Lush"                   off \
       "dronezone"      "Drone Zone"             off \
@@ -42,5 +43,5 @@ while true; do
   test $? == 1 && exit
   station="$(cat $tempfile)"
   mplayer -quiet -vo none -ao sdl http://somafm.com/startstream=${station}.pls 2>&1 \
-    | dialog --progressbox 50 90
+    | dialog --progressbox 20 60
 done

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ -n "$(pidof pianobar)" ]; then
+  echo -n 'n' > ~/.config/pianobar/ctl
+  exit
+fi
+
+if [ -n "$(pidof mplayer)" ]; then
+  echo 'pt_step 1' > /tmp/mplayer
+  exit
+fi
