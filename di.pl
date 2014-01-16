@@ -27,7 +27,7 @@ while (1) {
 sub play {
   my ($station) = @_;
 
-  my $temp = File::Temp->new(SUFFIX => '.pls', UNLINK => 0);
+  my $temp = File::Temp->new(SUFFIX => '.pls', UNLINK => 1);
   build_playlist($station, $di_fm_pub_range, $temp->filename);
 
   my $mplayer_cmd = qq{mplayer $mplayer_opts -playlist } . $temp->filename . q{ 2>&1};
