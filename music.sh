@@ -7,6 +7,7 @@ if [ $? -ne 0 ]; then
   tmux new-session -d -s music -n somafm 'somafm.sh'
   tmux new-window -a -d -n pandora
   tmux new-window -a -d -n subsonic
+  tmux new-window -a -d -n 'digitally imported'
 fi
 
 tmux attach -t music
