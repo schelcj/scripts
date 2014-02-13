@@ -1,0 +1,6 @@
+#!/bin/sh
+export TMPDIR=$(mktemp -d)
+FILE="${TMPDIR}/note from dmenu.txt"
+echo "$*" > $FILE
+gnsync --path $TMPDIR --format plain --notebook INBOX --logpath "/tmp/gnsync.log"
+rm -rf $TMPDIR
