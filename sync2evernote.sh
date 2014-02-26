@@ -2,7 +2,7 @@
 
 LOG="${HOME}/tmp/geeknote_sync.log"
 DROPBOX="${HOME}/Dropbox"
-WIKI="${DROPBOX}/Wiki"
+WIKI="${DROPBOX}/Wikis"
 NOTES="${DROPBOX}/Documents/MeetingNotes"
 
 # Sync my vimwiki personal wiki
