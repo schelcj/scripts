@@ -3,48 +3,46 @@
 use local::lib;
 use Modern::Perl;
 use Carp qw(confess);
-use Readonly;
 use DB_File;
-use System::Command;
 use File::Slurp qw(read_file write_file append_file);
 use Getopt::Compact;
 use Data::Dumper;
 use File::Find::Object;
 use File::Flock::Tiny;
 use Proc::Daemon;
+use IPC::System::Simple qw(capture);
 
-Readonly::Scalar my $PREFIX           => qq($ENV{HOME}/.wallpapers);
-Readonly::Scalar my $TMPDIR           => qq($ENV{HOME}/tmp);
-Readonly::Scalar my $LOCK             => qq{$PREFIX/lock};
-Readonly::Scalar my $HISTORY          => qq{$PREFIX/history};
-Readonly::Scalar my $CATEGORY         => qq{$PREFIX/category};
-Readonly::Scalar my $WALLPAPER_DIR    => qq{$PREFIX/Wallpapers};
-Readonly::Scalar my $CURRENT          => qq{$PREFIX/current};
-Readonly::Scalar my $RESOLUTION       => qq{$PREFIX/resolution};
-Readonly::Scalar my $PREVIOUS         => qq{$PREFIX/previous};
-Readonly::Scalar my $LOG              => qq{$PREFIX/log};
-Readonly::Scalar my $SOURCES          => qq{$PREFIX/sources};
-Readonly::Scalar my $PIDFILE          => qq{$PREFIX/wallpaper.pid};
-Readonly::Scalar my $SLEEP_INTERVAL   => 60*60;
-Readonly::Scalar my $BGSETTER         => q{fbsetbg};
-Readonly::Scalar my $BGSETTER_OPTS    => q{-a};
-Readonly::Scalar my $SLASH            => q{/};
-Readonly::Scalar my $DEFAULT_CATEGORY => q{all};
+my $PREFIX           = qq($ENV{HOME}/.wallpapers);
+my $TMPDIR           = qq($ENV{HOME}/tmp);
+my $LOCK             = qq{$PREFIX/lock};
+my $HISTORY          = qq{$PREFIX/history};
+my $CATEGORY         = qq{$PREFIX/category};
+my $WALLPAPER_DIR    = qq{$PREFIX/Wallpapers};
+my $CURRENT          = qq{$PREFIX/current};
+my $PREVIOUS         = qq{$PREFIX/previous};
+my $LOG              = qq{$PREFIX/log};
+my $SOURCES          = qq{$PREFIX/sources};
+my $PIDFILE          = qq{$PREFIX/wallpaper.pid};
+my $SLEEP_INTERVAL   = 60*15;
+my $BGSETTER         = q{fbsetbg};
+my $BGSETTER_OPTS    = q{-a};
+my $SLASH            = q{/};
+my $DEFAULT_CATEGORY = q{all};
 
 ## no tidy
 my $opts = Getopt::Compact->new(
   struct => [
     [[qw(c category)],    q(Wallpaper category),                                ':s'],
-    [[qw(r resolution)],  q(Wallpaper resolution),                              ':s'],
     [[qw(f flush-cache)], q(Flush the wallpaper cache)                              ],
     [[qw(d dump-cache)],  q(Dump the wallpaper cache)                               ],
     [[qw(l lock)],        q(Lock the current paper)                                 ],
     [[qw(u unlock)],      q(Unlock the current paper)                               ],
-    [[qw(clear)],         q(Clear previous category/resoution)                      ],
+    [[qw(clear)],         q(Clear previous category)                                ],
     [[qw(p previous)],    q(Set wallpaper to previous paper)                        ],
     [[qw(s sleep)],       q(How long to sleep, in seconds, if run as a daemon), ':i'],
     [[qw(D daemon)],      q(Background process for a slide show effect)             ],
     [[qw(stop)],          q(Stop a running daemon)                                  ],
+    [[qw(i image)],       q(Set image as wallpaper),                            ':s'],
   ]
 )->opts();
 ## end no tidy
@@ -56,15 +54,10 @@ tie %history, 'DB_File', $HISTORY; ## no critic (ProhibitTies)
 
 if ($opts->{clear}) {
   unlink $CATEGORY;
-  unlink $RESOLUTION;
 }
 
 if ($opts->{category}) {
   write_file($CATEGORY, $opts->{category});
-}
-
-if ($opts->{resolution} and $opts->{category}) {
-  write_file($RESOLUTION,$opts->{resolution});
 }
 
 if ($opts->{'flush-cache'}) {
@@ -100,7 +93,13 @@ if ($opts->{stop}) {
   exit;
 }
 
-# TODO - this isn't working as i want
+if ($opts->{image}) {
+  set_wallpaper($opts->{image});
+  exit;
+}
+
+# XXX this isn't working as i want
+# XXX i'm getting the wrong pid
 my $lock = File::Flock::Tiny->write_pid($PIDFILE) or die q{Another wallpaper.pl process is running};
 
 if ($opts->{daemon}) {
@@ -109,7 +108,7 @@ if ($opts->{daemon}) {
 
     if (not $pid) {
       while (1) {
-        set(); 
+        set() if not -e $LOCK;
         sleep($opts->{sleep}||$SLEEP_INTERVAL);
       }
     }
@@ -162,7 +161,6 @@ sub _build_path {
 sub get_wallpaper_dirs {
   my @paths = ();
   my $category = get_category();
-  my $resolution = get_resolution();
 
   if ($category eq $DEFAULT_CATEGORY) {
     return map {_build_path($_)} read_file($SOURCES);
@@ -171,10 +169,6 @@ sub get_wallpaper_dirs {
   }
 
   push @paths, $category;
-
-  if (defined $resolution) {
-    push @paths, $resolution;
-  }
 
   my $dir = join($SLASH, @paths);
   confess qq{Wallpaper directory ($dir) does not exist} if not -e $dir;
@@ -207,24 +201,13 @@ sub get_random_wallpaper {
 sub set_wallpaper {
   my ($paper) = @_;
 
-  my $cmd_str = sprintf q{%s '%s'}, get_bgsetter(), $paper;
-  my $cmd     = System::Command->new($cmd_str);
-  my $stdout  = $cmd->stdout();
-  my $stderr  = $cmd->stderr();
+  my $cmd_str = sprintf q{%s %s}, get_bgsetter(), $paper;
+  my $rv      = capture($cmd_str);
 
-  while (<$stdout>) {
-    append_file($LOG, $_);
-  }
-
-  while (<$stderr>) {
-    append_file($LOG, $_);
-  }
-
-  $cmd->close();
   cache($paper);
   set_current($paper);
 
-  return $cmd->exit();
+  return $rv;
 }
 
 sub set_current {
@@ -236,10 +219,6 @@ sub set_current {
 
 sub get_category {
   return (-e $CATEGORY) ? read_file($CATEGORY) : $DEFAULT_CATEGORY;
-}
-
-sub get_resolution {
-  return (-e $RESOLUTION) ? read_file($RESOLUTION) : undef;
 }
 
 sub get_bgsetter {

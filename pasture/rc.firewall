@@ -1,0 +1,181 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.firewall: Local firewall initialization script
+#
+# Description: This is for a standalone host without a firewall in front
+#               of it. We do stateful matching for all traffic except 
+#               predefined ports that need to be open to the world.
+#               We only are concerned with the INPUT chain in the filter
+#               table since this is not a router.
+
+# Directory where all our config files live
+CONF_DIR="/etc/firewall"
+
+# list out the config files so we can verify they exist
+CONFS=(
+  IF
+  MASQ
+  PROXY
+  INT_NETWORK
+  LOG
+  ALLOWED_PORTS
+  ALLOWED_HOSTS
+  PORTFW
+  TABLES
+  DENIED_PORTS
+)
+
+# make sure the confs exist, bail out if they don't
+for conf in "${CONFS[@]}"; do
+  if [ ! -r $CONF_DIR/$conf ]; then
+    echo "Failed to locate configuration file '$CONF_DIR/$conf'!"
+    exit 1
+  fi
+done
+
+# where does the iptables binary live
+IPT=/usr/sbin/iptables
+
+# what interface do we listen on for incoming connections
+IF=$(cat $CONF_DIR/IF)
+INT_IF=$(cat $CONF_DIR/INT_IF)
+
+# will this host be doing NAT/MASQ (0 for NO, 1 for YES)
+MASQ=$(cat $CONF_DIR/MASQ)
+
+# will this host do transparent proxying with squid (0 for NO, 1 for YES)
+PROXY=$(cat $CONF_DIR/PROXY)
+
+# do we want to see any logs
+LOG=$(cat $CONF_DIR/LOG)
+
+# define our internal network netblock
+INT_NETWORK=($(cat $CONF_DIR/INT_NETWORK))
+
+# Allowed ports to punch holes for
+# format <proto>:<min_port#>[:<max_port#>]
+ALLOWED_PORTS=($(cat $CONF_DIR/ALLOWED_PORTS))
+
+# Allowed hosts/networks
+# format <ip_address>/[<netmask>|<cidr>]
+ALLOWED_HOSTS=($(cat $CONF_DIR/ALLOWED_HOSTS))
+
+# what ports to forward and where to forward them to
+# format: <internal_host>:<internal_port>:<external_port>:<protocol>
+PORTFW=($(cat $CONF_DIR/PORTFW))
+
+# what tables we have to work with
+TABLES=( `cat $CONF_DIR/TABLES` )
+
+# pull in ports to drop and not log
+# format <proto>:<min_port#>[:<max_port#>]
+DENIED_PORTS=($(cat $CONF_DIR/DENIED_PORTS))
+
+echo -n "Initializing firewall - "
+
+# clear out all the tables
+for i in "${TABLES[@]}"; do
+  $IPT -F -t $i
+done
+
+# setup our stateful rules
+$IPT -t filter -A INPUT -i $IF -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPT -t filter -A INPUT \! -i $IF -m state --state NEW -j ACCEPT
+
+# traffic to drop before loging takes effect
+for k in "${DENIED_PORTS[@]}"; do
+  proto=$(echo $k | cut -d \: -f 1)
+  min_port=$(echo $k | cut -d \: -f 2)
+  max_port=$(echo $k | cut -d \: -f 3)
+
+  if [ -z "$max_port" ]; then
+    port=$min_port
+  else
+    port="$min_port:$max_port"
+  fi
+
+  $IPT -t filter -A INPUT -i $IF -p $proto --dport $port -j DROP
+done
+
+# add a logging rule
+if [ $LOG == 1 ]; then
+  $IPT -t filter -A INPUT -p all -i $IF -m state --state NEW,INVALID \
+    -j LOG --log-prefix "UNAUTHORIZED PACKET "
+fi
+
+# dropping everything else
+$IPT -t filter -A INPUT -i $IF -m state --state NEW,INVALID -j DROP
+
+# We can have multiple internal networks that we need to proxy/masq
+for network in "${INT_NETWORK[@]}"; do
+  # add NAT/MASQ rules if we are a routing firewall
+  if [ $MASQ == 1 ]; then
+    # do the masquerading
+    $IPT -t nat -A POSTROUTING -o $IF -s $network -j MASQUERADE
+
+    # special case rule for site-to-site vpn tunnel for work
+    $IPT -t nat -A POSTROUTING -o tun0 -s $network -d 10.0.0.0/24 -j MASQUERADE
+
+    # make sure ip_forwarding is turned on in the kernel
+    ip_forward=$(cat /proc/sys/net/ipv4/ip_forward)
+    if [ $ip_forward != 1 ]; then
+      echo "1" > /proc/sys/net/ipv4/ip_forward
+    fi
+  fi
+
+  # setup squid redirector if we are to do transparent proxying
+  if [ $PROXY == 1 ]; then
+    # only redirect port 80 to our squid process, leave port 443 alone
+    $IPT -t nat -A PREROUTING -p tcp -i $INT_IF -s $network \
+      --dport 80:80 -j REDIRECT --to-ports 3128
+  fi
+done
+
+# add our port forwarding rules
+for i in "${PORTFW[@]}"; do
+  int_host=$(echo $i | cut -d \: -f 1)
+  int_port=$(echo $i | cut -d \: -f 2)
+  ext_port=$(echo $i | cut -d \: -f 3)
+  proto=$(echo $i | cut -d \: -f 4)
+
+  # actualy add the rule
+  $IPT -t nat -A PREROUTING -i $IF -p $proto \
+    --dport $ext_port:$ext_port -j DNAT \
+    --to-destination $int_host:$int_port
+done
+
+# setup our allowed ports
+for k in "${ALLOWED_PORTS[@]}"; do
+  proto=$(echo $k | cut -d \: -f 1)
+  min_port=$(echo $k | cut -d \: -f 2)
+  max_port=$(echo $k | cut -d \: -f 3)
+
+  # build out a port range if a max port number was specified
+  if [ -z "$max_port" ]; then
+    port=$min_port
+  else
+    port="$min_port:$max_port"
+  fi
+
+  # allow this port to be open to the world
+  $IPT -t filter -I INPUT -i $IF -p $proto --dport $port -j ACCEPT
+done
+
+# use the recent module to put a stop to ssh worms by limiting
+# the amount of times a host can connect within a givin time frame
+$IPT -t filter -I INPUT -i $IF -p tcp --dport 22 -m state --state NEW \
+  -m recent --set
+$IPT -t filter -I INPUT -i $IF -p tcp --dport 22 -m state --state NEW \
+  -m recent --update --seconds 60 --hitcount 4 -j DROP
+
+# add our user-defined chain for custom acl's
+$IPT -t filter -X tcprules
+$IPT -t filter -N tcprules
+$IPT -t filter -I INPUT -j tcprules
+
+# add rules for allowing specific hosts/networks full access
+for k in "${ALLOWED_HOSTS[@]}"; do
+  $IPT -t filter -I INPUT -p all -i $IF -s $k -j ACCEPT
+done
+
+echo "Done"

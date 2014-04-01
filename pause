@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ -n "$(pidof pianobar)" ]; then
+  echo -n 'p' > ~/.config/pianobar/ctl
+  exit
+fi
+
+if [ -n "$(pidof mplayer)" ]; then
+  echo 'pause' > /tmp/mplayer
+  exit
+fi

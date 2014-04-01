@@ -3,9 +3,9 @@
 # urxvt -rv -ls +sb -fn 9x15
 #
 # -fn 6x13
-# cmd="rxvt +sb -rv -ls -sl 5000"
+cmd="rxvt +sb -ls -sl 5000 -tr -sh 20 -fn 9x15"
 # cmd="aterm -sl 5000 +sb -ls -tr -sh 15 -bgtype cut"
-cmd="gnome-terminal"
+#cmd="gnome-terminal"
 host=$(echo $0|sed -e 's/\/home\/schelcj\/scripts\///')
 
 if [ "$host" != "term" ]; then
