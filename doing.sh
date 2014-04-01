@@ -7,7 +7,7 @@ if [ ! -e $LOCK ]; then
   DOING=$(zenity --display=:0 --title 'What are you doing?' --entry)
 
   if [ $? == 0 ]; then
-    doing now $DOING
+    /usr/local/bin/doing now $DOING
   fi
 
   rm $LOCK
