@@ -4,7 +4,7 @@ use Modern::Perl;
 use IPC::System::Simple qw(capture run);
 use Time::Piece;
 
-my $nb    = 'Journal';
+my $nb    = q{'03 Journal'};
 my $now   = Time::Piece->new();
 my $title = $now->strftime('%Y-%m-%d');
 
