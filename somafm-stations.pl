@@ -4,6 +4,7 @@ use Modern::Perl;
 use Mojo::UserAgent;
 use Mojo::DOM;
 use List::MoreUtils qw(uniq);
+use URI;
 
 my $somafm_url = q{http://somafm.com};
 my $agent      = Mojo::UserAgent->new();
