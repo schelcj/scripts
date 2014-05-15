@@ -1,7 +1,7 @@
 AIDE_NODES="bajor,idran,denobula,nagios,nagios2,ns,puppet1,salt,syslog,vpn,www"
 LOGIN_NODES="bajor,idran"
-SLURM_NODES="cn0[01-32],denobula,bajor,idran"
-COMPUTE_NODES="cn0[01-32]"
+SLURM_NODES="cn0[01-34],denobula,bajor,idran"
+COMPUTE_NODES="cn0[01-34]"
 VIRT_NODES="backuppc,cobbler,dhcp,dns,gw,nagios,ns,puppet1,salt,syslog,vpn,www"
 BIOSTAT_NODES="$(VIRT_NODES),$(SLURM_NODES)"
 
@@ -25,3 +25,6 @@ mr_up:
 
 reload_puppet:
 	pdsh -l root -w $(BIOSTAT_NODES) 'service puppet reload'
+
+restart_ganglia:
+	pdsh -l root -w $(COMPUTE_NODES) 'service ganglia-monitor restart'
