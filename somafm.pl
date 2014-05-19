@@ -15,6 +15,7 @@ my $radiolist_title    = q{Select a station to listen to};
 my $dialog_geom        = q{20 60};
 my $dialog_list_height = q{24};
 my @stations           = get_stations();
+my $mplayer_opts       = q{-prefer-ipv4 -nolirc -quiet -vo none -ao sdl -input file=/tmp/mplayer};
 
 while (1) {
   play(get_station_selection());
@@ -23,10 +24,9 @@ while (1) {
 sub play {
   my ($station) = @_;
 
-  my $url         = sprintf qq{$somafm_url/startstream=%s.pls}, $station;
-  my $mplayer_cmd = sprintf q{mplayer -quiet -vo none -ao sdl -input file=/tmp/mplayer %s 2>&1}, $url;
+  my $url = sprintf qq{$somafm_url/startstream=%s.pls}, $station;
 
-  run(qq{$mplayer_cmd | dialog --progressbox $dialog_geom});
+  run(qq{mplayer $mplayer_opts $url 2>&1 | dialog --progressbox $dialog_geom});
 
   return;
 }

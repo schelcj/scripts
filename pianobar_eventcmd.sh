@@ -1,5 +1,7 @@
 #!/bin/bash
 
+LOG="${HOME}/.config/pianobar/eventcmd.log"
+
 # create variables
 while read L; do
   k="`echo "$L" | cut -d '=' -f 1`"
@@ -9,6 +11,7 @@ done < <(grep -e '^\(title\|artist\|album\|stationName\|songStationName\|pRet\|p
 
 case "$1" in
   'songstart')
-    notify-send -u low "Pandora" "$title\nby $artist\non $songStationName"
+    station=$([ -z "$songStationName" ] && echo "$stationName" || echo "$songStationName")
+    notify-send -u low "Pandora" "$title\nby $artist\non $station"
     ;;
 esac
