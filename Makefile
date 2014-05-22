@@ -37,3 +37,6 @@ cluster_nodes:
 
 start_nctopd:
 	pdsh -l root -w $(COMPUTE_NODES) 'pidof nctopd || /home/software/lucid/nctop/0.23.2/sbin/nctopd -d -u nobody -w 5'
+
+check_restart_required:
+	pdsh -w $(BIOSTAT_NODES) "grep 'System restart required' /etc/motd"
