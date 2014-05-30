@@ -1,9 +1,18 @@
-AIDE_NODES="bajor,idran,denobula,nagios,nagios2,ns,puppet1,salt,syslog,vpn,www"
+AIDE_NODES="bajor,idran,denobula,nagios,nagios2,ns,puppet1,syslog,vpn,www"
 LOGIN_NODES="bajor,idran"
-COMPUTE_NODES="cn0[01-34]"
+COMPUTE_NODES="cn0[01-18,20-34]"
 SLURM_NODES="$(COMPUTE_NODES),denobula"
-VIRT_NODES="backuppc,cobbler,dhcp,dns,gw,nagios,ns,puppet1,salt,syslog,vpn,www"
+VIRT_NODES="backuppc,cobbler,dhcp,dns,gw,nagios,ns,puppet1,syslog,vpn,www"
 BIOSTAT_NODES="$(VIRT_NODES),$(SLURM_NODES)"
+
+all_nodes:
+	pdsh -l root -w "$(BIOSTAT_NODES)"
+
+cluster_nodes:
+	pdsh -l root -w "$(SLURM_NODES),$(LOGIN_NODES)"
+
+virt_nodes:
+	pdsh -l root -w "$(VIRT_NODES)"
 
 check_aide:
 	pdsh -w $(AIDE_NODES) 'ps ax|grep aide && ls -la /var/lib/aide/aide.db'
@@ -31,9 +40,6 @@ restart_ganglia:
 
 restart_slurm:
 	pdsh -l root -w $(SLURM_NODES) 'service slurm restart'
-
-cluster_nodes:
-	pdsh -l root -w "$(SLURM_NODES),$(LOGIN_NODES)"
 
 start_nctopd:
 	pdsh -l root -w $(COMPUTE_NODES) 'pidof nctopd || /home/software/lucid/nctop/0.23.2/sbin/nctopd -d -u nobody -w 5'
