@@ -1,9 +1,9 @@
-AIDE_NODES="bajor,idran,denobula,nagios,nagios2,ns,puppet1,syslog,vpn,www"
-LOGIN_NODES="bajor,idran"
-COMPUTE_NODES="cn0[01-18,20-34]"
-SLURM_NODES="$(COMPUTE_NODES),denobula"
-VIRT_NODES="backuppc,cobbler,dhcp,dns,gw,nagios,ns,puppet1,syslog,vpn,www"
-BIOSTAT_NODES="$(VIRT_NODES),$(SLURM_NODES)"
+AIDE_NODES=bajor,idran,denobula,nagios,nagios2,ns,puppet1,syslog,vpn,www
+LOGIN_NODES=bajor,idran
+COMPUTE_NODES=cn0[01-18,20-34]
+SLURM_NODES=$(LOGIN_NODES),$(COMPUTE_NODES),denobula
+VIRT_NODES=backuppc,cobbler,dhcp,dns,gw,nagios,ns,puppet1,regula,syslog,vpn,www,xfer
+BIOSTAT_NODES=$(VIRT_NODES),$(SLURM_NODES),nagios2
 
 all_nodes:
 	pdsh -l root -w "$(BIOSTAT_NODES)"
