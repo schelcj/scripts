@@ -1,2 +1,2 @@
 #!/bin/sh
-rtm add t:followup $*
+rtm add t:followup p:2 $*
