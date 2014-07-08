@@ -1,11 +1,13 @@
+MR=mr -d $(HOME) -j 5
+
 update_i3_config:
 	cd $(HOME)/.i3 && $(MAKE) && cd $(HOME)
 
 mr_stat:
-	mr -j 5 stat | most
+	$(MR) stat | most
 
 mr_push:
-	mr -j 5 push
+	$(MR) push
 
 mr_up:
-	mr -j 5 update
+	$(MR) update
