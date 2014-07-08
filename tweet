@@ -1,2 +1,2 @@
 #!/bin/sh
-ttytter -status="$*"
+ttytter -ssl -status="$*"
