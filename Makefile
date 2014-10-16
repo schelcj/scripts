@@ -11,3 +11,6 @@ mr_push:
 
 mr_up:
 	$(MR) update
+
+install-cpan-deps:
+	$(HOME)/bin/cpanm --installdeps $(PWD)
