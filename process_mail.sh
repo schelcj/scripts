@@ -1,5 +1,4 @@
 #!/bin/bash
-ACCOUNTS=(Pobox Umich)
-for account in "${ACCOUNTS[@]}"; do
-  offlineimap -u basic -o -a $account
+for account in pobox umich; do
+  /usr/local/bin/offlineimap -u basic -o -a ${account^}
 done
