@@ -1,15 +1,8 @@
 #!/bin/bash
 
-ACCOUNTS=(pobox umich)
-
-for acct in "${ACCOUNTS[@]}"; do
-  getmail --rcfile getmailrc-${acct}
-  mairix -F -f ~/.mairixrc-${acct}
+for acct in pobox umich; do
+  getmail -v --rcfile getmailrc-${acct}
+  mu index --nocleanup --maildir="~/Mail/${acct^}/[Gmail].Sent\ Mail" --muhome=~/.mu-sent-index
 done
 
-# mairix -F
-# pidof mairix 
-# if [ $? -eq "1" ]; then
-#   lock_file="${HOME}/.mairix.db.lock"
-#   test -e $lock_file && rm -v $lock_file
-# fi
+/usr/bin/mu index --maildir ${HOME}/Mail
