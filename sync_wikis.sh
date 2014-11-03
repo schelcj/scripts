@@ -10,6 +10,7 @@ WIKIS=(
   ConcertPharma:ConcertPharma
   SPH-ICS:SPH-ICS
   Biostat:Biostat
+  Flux:Flux
 )
 
 for line in "${WIKIS[@]}"; do
