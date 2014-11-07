@@ -15,7 +15,7 @@ my $radiolist_title    = q{Select a station to listen to};
 my $dialog_geom        = q{20 60};
 my $dialog_list_height = q{24};
 my @stations           = get_stations();
-my $mplayer_opts       = q{-prefer-ipv4 -nolirc -quiet -vo none -ao sdl -input file=/tmp/mplayer};
+my $mplayer_opts       = q{-prefer-ipv4 -nolirc -quiet -vo none -ao sdl -playlist};
 
 while (1) {
   play(get_station_selection());
