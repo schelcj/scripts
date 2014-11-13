@@ -1,5 +1,4 @@
 requires 'App::Ack';
-requires 'App::perlfind';
 requires 'Perl::Critic';
 requires 'Perl::Tidy';
 requires 'Modern::Perl';

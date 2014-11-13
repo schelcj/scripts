@@ -1,8 +1,21 @@
-#!/bin/sh
+#!/bin/bash
 
 export PATH=/usr/local/bin:$PATH
 
-gnsync -p ~/Dropbox/Wikis/Default -f markdown -n Wiki -l ~/tmp/gnsync.log
+LOG=~/tmp/gnsync.log
+WIKI_DIR=$HOME/Dropbox/Wikis
+WIKIS=(
+  Default:Wiki
+  Labbooks:Labbooks
+  ConcertPharma:ConcertPharma
+  SPH-ICS:SPH-ICS
+  Biostat:Biostat
+  Flux:Flux
+)
 
-# XXX - causes duplicate notes to be created, why?
-#gnsync -p ~/Dropbox/Wikis/Default/journal -f markdown -n Journal -l ~/tmp/gnsync.log -t TWO_WAY
+for line in "${WIKIS[@]}"; do
+  wiki=$(echo $line|cut -d\: -f1)
+  notebook=$(echo $line|cut -d\: -f2)
+
+  gnsync -p $WIKI_DIR/$wiki -f markdown -n "$notebook" -l $LOG
+done
