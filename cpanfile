@@ -13,3 +13,5 @@ requires 'File::Flock::Tiny';
 requires 'Mojo::UserAgent';
 requires 'IPC::System::Simple';
 requires 'Try::Tiny';
+requires 'Getopt::Std::Strict';
+requires 'Text::CSV::Slurp';
