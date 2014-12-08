@@ -8,9 +8,9 @@ WIKIS=(
   Default:Wiki
   Labbooks:Labbooks
   ConcertPharma:ConcertPharma
-  SPH-ICS:Umich-SPH-ICS
-  Biostat:Umich-Biostat
-  Flux:Umich-Flux
+  SPH-ICS:SPH-ICS
+  Biostat:Biostat
+  Flux:Flux
 )
 
 for line in "${WIKIS[@]}"; do
