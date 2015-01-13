@@ -9,5 +9,5 @@ rofi \
   -ssh \
   -set \
   -title true \
-  -switchers window,run,ssh \
-  -show run
+  -switchers "window,run,ssh,Workspaces:i3_switch_workspaces.sh" \
+  -show window
