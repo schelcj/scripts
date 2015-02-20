@@ -11,6 +11,7 @@ WIKIS=(
   SPH-ICS:SPH-ICS
   Biostat:Biostat
   Flux:Flux
+  CSG:CSG
 )
 
 for line in "${WIKIS[@]}"; do
