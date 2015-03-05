@@ -15,3 +15,4 @@ requires 'IPC::System::Simple';
 requires 'Try::Tiny';
 requires 'Getopt::Std::Strict';
 requires 'Text::CSV::Slurp';
+requires 'iCal::Parser';
