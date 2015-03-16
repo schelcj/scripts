@@ -6,11 +6,6 @@ LOG=~/tmp/gnsync.log
 WIKI_DIR=$HOME/Dropbox/Wikis
 WIKIS=(
   Default:Wiki
-  Labbooks:Labbooks
-  ConcertPharma:ConcertPharma
-  SPH-ICS:SPH-ICS
-  Biostat:Biostat
-  Flux:Flux
   CSG:CSG
 )
 
