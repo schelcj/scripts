@@ -7,11 +7,6 @@ WIKI_DIR=$HOME/Dropbox/Wikis
 WIKIS=(
   Journal:Journal
   Default:Wiki
-  Labbooks:Labbooks
-  ConcertPharma:ConcertPharma
-  SPH-ICS:SPH-ICS
-  Biostat:Biostat
-  Flux:Flux
   CSG:CSG
 )
 
