@@ -9,6 +9,9 @@ WIKIS=(
   Labbooks:Labbooks
   CSG:CSG
   ConcertPharma:ConcertPharma
+  Flux:Flux
+  SPH:SPH
+  Biostat:Biostat
 )
 
 for line in "${WIKIS[@]}"; do
