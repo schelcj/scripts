@@ -12,6 +12,7 @@ WIKIS=(
   Flux:Flux
   SPH:SPH
   Biostat:Biostat
+  MyNorth:MyNorth
 )
 
 for line in "${WIKIS[@]}"; do
