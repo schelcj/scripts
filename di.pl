@@ -9,7 +9,7 @@ use File::Slurp qw(read_file write_file append_file);
 use Try::Tiny;
 use URI;
 
-my $di_url             = q{http://www.di.fm/};
+my $di_url             = q{http://www.di.fm/webplayer3/config};
 my $di_fm_url          = q{http://pub%d.di.fm:80/di_%s};
 my $backtitle          = q{Digitally Imported: Addictive Electronic Music};
 my $title              = q{Select a channel to listen to};
@@ -69,7 +69,7 @@ sub build_playlist {
   write_file($file, qq{[playlist]\n});
   append_file($file, qq{NumberOfEntries=$range\n});
 
-  for (1..$range) {
+  for (1 .. $range) {
     my $url = sprintf $di_fm_url, $_, $station;
 
     append_file($file, qq{File$_=$url\n});
@@ -79,20 +79,9 @@ sub build_playlist {
 }
 
 sub get_channels {
-  my ($url)    = @_;
-  my $agent    = Mojo::UserAgent->new();
-  my $dom      = Mojo::DOM->new($agent->get($url)->res->body);
-  my @channels = ();
+  my ($url) = @_;
+  my $agent = Mojo::UserAgent->new();
+  my $json  = $agent->get($url)->res->json;
 
-  $dom->find('div.lists ul li')->each(
-    sub {
-      my $node = shift;
-      (my $channel_url = URI->new($node->at('span.play')->attr('data-tunein-url'))->path()) =~ s/\///g;
-      my $channel_title = $node->at('a span')->text();
-
-      push @channels, [$channel_title, $channel_url];
-    }
-  );
-
-  return @channels;
+  return map {[$_->{name}, $_->{key}]} @{$json->{WP}->{channels}};
 }
