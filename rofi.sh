@@ -1,6 +1,5 @@
 #!/bin/sh
 rofi \
-  -lines 5 \
   -location 1 \
   -width 100 \
   -bg "#484e50" \
