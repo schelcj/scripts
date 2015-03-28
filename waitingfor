@@ -1,2 +1,2 @@
 #!/bin/sh
-rtm add t:waitingfor p:3 $*
+rtm add l:waitingfor $*
