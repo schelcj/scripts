@@ -1,2 +1,2 @@
 #!/bin/sh
-rtm add l:followup $*
+rtm add $* l:FollowUp
