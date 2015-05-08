@@ -16,6 +16,9 @@ while true; do
       "1472493" "Ambient Bass" off \
       "1744730" "Grandpa's Naptime" off \
       "1724146" "Lush Electronic Yoga" off \
+      "1754151" "90s Gone Country" off \
+      "1407663" "Alt Songs from '90s Movies" off \
+      "1392507" "90s Alt Rock Ballads" off \
      2> $TEMP || exit
 
   pyza -v $(cat $TEMP) 2>&1 | dialog --progressbox 20 100
