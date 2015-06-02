@@ -7,12 +7,7 @@ WIKI_DIR=$HOME/Dropbox/Wikis
 WIKIS=(
   Default:Default-Wiki
   Labbooks:Labbooks-Wiki
-  CSG:CSG-Wiki
-  ConcertPharma:ConcertPharma-Wiki
-  Flux:Flux-Wiki
-  SPH:SPH-Wiki
-  Biostat:Biostat-Wiki
-  MyNorth:MyNorth-Wiki
+  Glossary:Glossary-Wiki
 )
 
 for line in "${WIKIS[@]}"; do
