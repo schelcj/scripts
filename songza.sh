@@ -21,6 +21,8 @@ while true; do
       "1392507" "90s Alt Rock Ballads" off \
       "1379367" "The soulful Touch of Muscle Shoals" off \
       "1771056" "Never-ending Soul" off \
+      "1412009" "The World of Grateful Dead" off \
+      "1385346" "Essential Jam Bands" off \
      2> $TEMP || exit
 
   pyza -v $(cat $TEMP) 2>&1 | dialog --progressbox 20 100
