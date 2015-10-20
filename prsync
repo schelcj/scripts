@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Original Source: https://wiki.ncsa.illinois.edu/display/~wglick/Parallel+Rsync
+
+VERBOSE=0
+THREADS=8
+
+while getopts "s:d:t:v" opt; do
+  case $opt in
+    s)
+      SRCDIR=$OPTARG
+      ;;
+    d)
+      DESTDIR=$OPTARG
+      ;;
+    t)
+      THREADS=$OPTARG
+      ;;
+    v)
+      VERBOSE=1
+      ;;
+    h|help)
+      echo "Usage: $0 [s|d|t]"
+      exit 1
+      ;;
+    *)
+      echo "Usage: $0 [s|d|t]"
+      exit 1
+  esac
+done
+
+if [ $VERBOSE == 1 ]; then
+  echo "SRCDIR: $SRCDIR"
+  echo "DESTDIR: $DESTDIR"
+  echo "THREADS: $THREADS"
+fi
+
+# RSYNC DIRECTORY STRUCTURE
+echo "rsync -zvr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/"
+
+# FOLLOWING MAYBE FASTER BUT NOT AS FLEXIBLE
+# cd $SRCDIR; find . -type d -print0 | cpio -0pdm $DESTDIR/
+
+# FIND ALL FILES AND PASS THEM TO MULTIPLE RSYNC PROCESSES
+echo "cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -avz % $DESTDIR/% "
+
+# IF YOU WANT TO LIMIT THE IO PRIORITY, 
+# PREPEND THE FOLLOWING TO THE rsync & cd/find COMMANDS ABOVE:
+# ionice -c2
