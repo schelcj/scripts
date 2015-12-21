@@ -1,2 +1,2 @@
 #!/bin/sh
-echo $* | mail -s "$*" $(cat ~/.config/trello/research-addr.txt)
+rtm add $* t:research
