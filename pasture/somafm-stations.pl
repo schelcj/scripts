@@ -24,6 +24,8 @@ $dom->find('li.cbshort')->each(
 
 for my $station (@stations) {
   my $url = sprintf qq{$somafm_url/startstream=%s.pls}, $station->[1];
+  say "SomaFM: $station->[0], $url";
+  next;
   my $asset = $agent->get($url)->res->content->asset;
 
   my $content = $asset->slurp;
