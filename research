@@ -1,2 +1,2 @@
 #!/bin/sh
-rtm add $* t:research
+rtm add $* l:research
