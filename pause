@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "$(playerctl -l)" == "spotify" ]; then
+  playerctl play-pause
+  exit
+fi
+
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'p' > ~/.config/pianobar/ctl
   exit
