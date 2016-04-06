@@ -5,6 +5,17 @@ if [ "$(playerctl -l)" == "spotify" ]; then
   exit
 fi
 
+if [ "$(playerctl -l)" == "clementine" ]; then
+  case "$(playerctl status)" in
+    Playing)
+      playerctl stop
+      ;;
+    Stopped)
+      playerctl play
+      ;;
+  esac
+fi
+
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'p' > ~/.config/pianobar/ctl
   exit
