@@ -1,9 +1,10 @@
 #!/bin/sh
 
-if [ "$(playerctl -l)" == "spotify" ]; then
-  playerctl play-pause
-  exit
-fi
+case "$(playerctl -l)" in
+  spotify|google-play-music-desktop-player)
+    playerctl play-pause
+    ;;
+esac
 
 if [ "$(playerctl -l)" == "clementine" ]; then
   case "$(playerctl status)" in

@@ -1,9 +1,10 @@
 #!/bin/sh
 
-if [ "$(playerctl -l)" == "spotify" ]; then
-  playerctl next
-  exit
-fi
+case "$(playerctl -l)" in
+  spotify|google-play-music-desktop-player)
+    playerctl next
+    ;;
+esac
 
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'n' > ~/.config/pianobar/ctl
