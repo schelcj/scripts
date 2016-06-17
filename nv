@@ -1,0 +1,3 @@
+#!/bin/sh
+export PYTHONPATH=/usr/local/lib/python
+/usr/local/bin/nvpy

@@ -1,2 +1,2 @@
 #!/bin/sh
-gksudo pm-suspend
+xscreensaver-command -lock && gksudo pm-suspend
