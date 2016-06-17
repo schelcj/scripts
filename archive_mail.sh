@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/usr/local/bin:$PATH
+
 for acct in pobox umich; do
   getmail -v --rcfile getmailrc-${acct}
   mu index --nocleanup --maildir="~/Mail/${acct^}/[Gmail].Sent\ Mail" --muhome=~/.mu-sent-index
