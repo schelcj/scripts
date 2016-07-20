@@ -1,2 +1,3 @@
 #!/bin/sh
-rtm add $* l:FollowUp
+#rtm add $* l:FollowUp
+task add +followup $*
