@@ -2,10 +2,11 @@
 
 # Original Source: https://wiki.ncsa.illinois.edu/display/~wglick/Parallel+Rsync
 
+DRYRUN=0
 VERBOSE=0
 THREADS=8
 
-while getopts "s:d:t:v" opt; do
+while getopts "s:d:t:vn" opt; do
   case $opt in
     s)
       SRCDIR=$OPTARG
@@ -15,6 +16,9 @@ while getopts "s:d:t:v" opt; do
       ;;
     t)
       THREADS=$OPTARG
+      ;;
+    n)
+      DRYRUN=1
       ;;
     v)
       VERBOSE=1
@@ -29,20 +33,28 @@ while getopts "s:d:t:v" opt; do
   esac
 done
 
-if [ $VERBOSE == 1 ]; then
+if [ $VERBOSE -eq 1 ]; then
   echo "SRCDIR: $SRCDIR"
   echo "DESTDIR: $DESTDIR"
   echo "THREADS: $THREADS"
 fi
 
 # RSYNC DIRECTORY STRUCTURE
-echo "rsync -zvr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/"
+if [ $DRYRUN -eq 1 ]; then
+  echo "rsync -zvr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/"
+else
+  rsync -zvr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/
+fi
 
 # FOLLOWING MAYBE FASTER BUT NOT AS FLEXIBLE
 # cd $SRCDIR; find . -type d -print0 | cpio -0pdm $DESTDIR/
 
 # FIND ALL FILES AND PASS THEM TO MULTIPLE RSYNC PROCESSES
-echo "cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -avz % $DESTDIR/% "
+if [ $DRYRUN -eq 1 ]; then
+  echo "cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -avz % $DESTDIR/% "
+else
+  cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -avz --no-g % $DESTDIR/%
+fi
 
 # IF YOU WANT TO LIMIT THE IO PRIORITY, 
 # PREPEND THE FOLLOWING TO THE rsync & cd/find COMMANDS ABOVE:
