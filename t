@@ -1,3 +1,3 @@
 #!/bin/sh
-#rtm add $*
-task add $*
+rtm add $*
+#task add $*
