@@ -1,0 +1,17 @@
+#!/bin/sh
+
+case "$(playerctl -l)" in
+  spotify|google-play-music-desktop-player)
+    playerctl previous
+    ;;
+esac
+
+if [ -n "$(pidof pianobar)" ]; then
+  echo -n 'p' > ~/.config/pianobar/ctl
+  exit
+fi
+
+if [ -n "$(pidof mplayer)" ]; then
+  echo 'pt_step -1' > /tmp/mplayer
+  exit
+fi
