@@ -1,21 +1,10 @@
 #!/bin/sh
 
 case "$(playerctl -l)" in
-  spotify|google-play-music-desktop-player)
+  spotify|google-play-music-desktop-player|clementine)
     playerctl play-pause
     ;;
 esac
-
-if [ "$(playerctl -l)" == "clementine" ]; then
-  case "$(playerctl status)" in
-    Playing)
-      playerctl stop
-      ;;
-    Stopped)
-      playerctl play
-      ;;
-  esac
-fi
 
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'p' > ~/.config/pianobar/ctl
