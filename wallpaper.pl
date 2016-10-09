@@ -71,7 +71,7 @@ if ($opts->{'dump-cache'}) {
 }
 
 if ($opts->{lock}) {
-  write_file($LOCK, '1');
+  write_file($LOCK, '2');
   exit;
 }
 
