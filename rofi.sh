@@ -5,10 +5,12 @@
 #  -location 1 \
 #  -lines 5 \
 
+SHOW=$1
+
 rofi \
   -padding 1 \
   -ssh \
   -set \
   -title true \
   -switchers "window,run,ssh,Workspaces:i3_switch_workspaces.sh" \
-  -show window
+  -show ${SHOW:='window'}
