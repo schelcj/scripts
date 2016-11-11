@@ -41,9 +41,9 @@ fi
 
 # RSYNC DIRECTORY STRUCTURE
 if [ $DRYRUN -eq 1 ]; then
-  echo "rsync -zvr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/"
+  echo "rsync -vr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/"
 else
-  rsync -zvr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/
+  rsync -vr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/
 fi
 
 # FOLLOWING MAYBE FASTER BUT NOT AS FLEXIBLE
@@ -51,9 +51,9 @@ fi
 
 # FIND ALL FILES AND PASS THEM TO MULTIPLE RSYNC PROCESSES
 if [ $DRYRUN -eq 1 ]; then
-  echo "cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -avz % $DESTDIR/% "
+  echo "cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -av % $DESTDIR/% "
 else
-  cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -avz --no-g % $DESTDIR/%
+  cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -av --no-g % $DESTDIR/%
 fi
 
 # IF YOU WANT TO LIMIT THE IO PRIORITY, 
