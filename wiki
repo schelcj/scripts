@@ -1,0 +1,13 @@
+#!/bin/sh
+
+case $(tty) in
+  /dev/pts/[0-9]*)
+    VIM=vi
+    ;;
+  *)
+    VIM=gvim
+    ;;
+esac
+
+$VIM -c ':VimwikiIndex'
+
