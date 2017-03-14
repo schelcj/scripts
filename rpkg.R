@@ -6,7 +6,7 @@ codename  <- system("lsb_release -c|awk {'print $2'}", intern=TRUE);
 site_lib  <- paste(sep='/', '/home/software', codename, 'R', getRversion(), 'site-library');
 
 .libPaths(site_lib);
-options(repos='http://cran.mtu.edu/');
+options(repos='https://cloud.r-project.org/');
 
 opt <- getopt(matrix(c(
   'help',         'h', 0, "logical",   "Usage information",
