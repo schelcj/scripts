@@ -1,2 +1,7 @@
 #!/bin/sh
-amixer -q sset Master 5%-
+pgrep pianobar
+if [ $? -eq 0 ]; then
+  echo -n '(' > ~/.config/pianobar/ctl
+else
+  amixer -q sset Master 5%-
+fi
