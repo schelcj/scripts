@@ -25,7 +25,7 @@ my $SOURCES          = qq{$PREFIX/sources};
 my $PIDFILE          = qq{$PREFIX/wallpaper.pid};
 my $SLEEP_INTERVAL   = 60*15;
 my $BGSETTER         = q{fbsetbg};
-my $BGSETTER_OPTS    = q{-a};
+my $BGSETTER_OPTS    = q{-f};
 my $SLASH            = q{/};
 my $DEFAULT_CATEGORY = q{all};
 
