@@ -62,7 +62,6 @@ if ($opts->{category}) {
 
 if ($opts->{'flush-cache'}) {
   flush_cache();
-  exit;
 }
 
 if ($opts->{'dump-cache'}) {
@@ -70,14 +69,12 @@ if ($opts->{'dump-cache'}) {
   exit;
 }
 
-if ($opts->{lock}) {
-  write_file($LOCK, '2');
-  exit;
-}
-
 if ($opts->{unlock}) {
   unlink $LOCK;
-  exit;
+}
+
+if ($opts->{lock}) {
+  write_file($LOCK, '2');
 }
 
 if ($opts->{previous}) {
