@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/bin/bash
 export TERM=xterm-256color
-mc
+/usr/lib/mc/mc-wrapper.sh
