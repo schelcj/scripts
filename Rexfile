@@ -26,6 +26,15 @@ task 'enable_dunst' => sub {
   run('mv /usr/share/dbus-1/services/org.freedesktop.Notifications.service{,.disabled}');
 };
 
+batch 'prepare', (
+  qw(
+    prereqs
+    setup_suspend
+    setup_dropbox_watches
+    enable_dunst
+  );
+);
+
 # XXX - sudo not required for these tasks
 task 'setup_dropbox' => sub {
   run('wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -');
@@ -52,6 +61,8 @@ task 'set_defaults' => sub {
 };
 
 task 'setup_wallpapers' => sub {
+  mkdir("$ENV{HOME}/.wallpapers");
+
   cron add => $ENV{USER}, {
     minute       => '*/15',
     hour         => '*',
@@ -59,6 +70,10 @@ task 'setup_wallpapers' => sub {
     day_of_week  => '*',
     command      => "$ENV{HOME}/bin/change-wallpaper",
   };
+};
+
+task 'setup_rtm' => sub {
+  run('pip install rtm');
 };
 
 sub _packages_install {
@@ -100,10 +115,8 @@ sub _packages_install {
     mosh
     feh
     aumix-gtk
-    python-markdown
-    python-setuptools
     keepassx
-    libXss1
+    libxss1
     remmina
     remmina-plugin-nx
     remmina-plugin-vnc
@@ -138,6 +151,9 @@ sub _packages_install {
     python-simplejson
     python-parsedatetime
     python-vobject
+    python-markdown
+    python-setuptools
+    python-pip
     xpad
     clipit
     weather-util
