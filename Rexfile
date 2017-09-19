@@ -32,7 +32,7 @@ batch 'prepare', (
     setup_suspend
     setup_dropbox_watches
     enable_dunst
-  );
+  )
 );
 
 # XXX - sudo not required for these tasks
@@ -160,6 +160,7 @@ sub _packages_install {
     inxi
     redshift-gtk
     rxvt-unicode
+    autossh
   )];
 }
 
