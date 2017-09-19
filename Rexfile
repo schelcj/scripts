@@ -161,6 +161,8 @@ sub _packages_install {
     redshift-gtk
     rxvt-unicode
     autossh
+    rofi
+    curl
   )];
 }
 
