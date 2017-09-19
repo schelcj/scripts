@@ -160,6 +160,8 @@ sub _packages_install {
     inxi
     redshift-gtk
     rxvt-unicode
+    rofi
+    curl
   )];
 }
 
