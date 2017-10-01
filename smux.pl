@@ -2,9 +2,14 @@
 
 use strict;
 use warnings;
-use Getopt::Long;
+use autodie qw(:all);
+
+use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
-use IO::All;
+use File::Which;
+
+my $autossh = which 'autossh';
+die 'Can not fine autossh' unless $autossh;
 
 my $autossh_defaults = {
   AUTOSSH_POLL     => 20,
@@ -16,22 +21,21 @@ my $autossh_defaults = {
 };
 
 GetOptions(
-  'R|host=s'     => \(my $host    = undef),
+  'a|autossh:s%' => \($autossh_defaults),
+  'H|host=s'     => \(my $host = undef),
   's|session:s'  => \(my $session = 'smux'),
   'k|ssh-key:s'  => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
-  'a|autossh:s%' => \($autossh_defaults),
-  'h|help'       => \(my $help    = 0),
-  'man'          => \(my $man     = 0),
+  'h|help'       => \(my $help = 0),
+  'man'          => \(my $man = 0),
   )
   or pod2usage(1);
 
 pod2usage(1) if $help;
 pod2usage(-exitval => 0, -verbose => 2) if $man;
 
-my $port = undef;
 {
-  $port = int(rand(32000));
-  last if $port >= 20000;
+  $autossh_defaults->{AUTOSSH_PORT} = int(rand(32000));
+  last if $autossh_defaults->{AUTOSSH_PORT} >= 20000;
   redo;
 }
 
@@ -41,16 +45,17 @@ for (keys %{$autossh_defaults}) {
 }
 
 unless (exists $ENV{SSH_AUTH_SOCK}) {
-  # FIXME - this whole thing doesn't work yet.
-  for (io->pipe('ssh-agent -s')->getlines) {
+  open my $fh, 'ssh-agent -s |';
+
+  for (<$fh>) {
     my ($var, $val) = split(/=/);
     $ENV{$var} = $val;
   }
 
-  exec "ssh-add $ssh_key";
+  close $fh;
 }
 
-exec "autossh -t $host 'tmux attach -t $session || tmux new-session -s $session'";
+exec "$autossh -t $host 'tmux attach -t $session || tmux new-session -s $session'";
 
 __END__
 
@@ -64,7 +69,7 @@ smux.pl [options]
 
   Options:
 
-    -R, --host      Remote host to connect [required]
+    -H, --host      Remote host to connect [required]
     -s, --session   Tmux session to attach or create on the remote host (default: smux-default)
     -k, --ssh-key   Path to private ssh key to use for connection
     -a, --autossh   Set autossh environment variables. See the autossh man page
@@ -76,10 +81,10 @@ smux.pl [options]
 
 =head1 EXAMPLES
 
-  smux.pl -R foo.com
-  smux.pl -R foo.com -s misc
-  smux.pl -R foo.com -k ~/.ssh/id_dsa
-  smux.pl -R foo.com -a AUTOSSH_POLL=20 -a AUTOSSH_DEBUG=yes
+  smux.pl -H foo.com
+  smux.pl -H foo.com -s misc
+  smux.pl -H foo.com -k ~/.ssh/id_dsa
+  smux.pl -H foo.com -a AUTOSSH_POLL=20 -a AUTOSSH_DEBUG=yes
 
 =head1 DESCRIPTION
 
