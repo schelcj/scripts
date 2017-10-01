@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
+use IO::All;
 
 my $autossh_defaults = {
   AUTOSSH_POLL     => 20,
@@ -16,7 +17,7 @@ my $autossh_defaults = {
 
 GetOptions(
   'R|host=s'     => \(my $host    = undef),
-  's|session:s'  => \(my $session = 'smux-default'),
+  's|session:s'  => \(my $session = 'smux'),
   'k|ssh-key:s'  => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
   'a|autossh:s%' => \($autossh_defaults),
   'h|help'       => \(my $help    = 0),
@@ -40,7 +41,8 @@ for (keys %{$autossh_defaults}) {
 }
 
 unless (exists $ENV{SSH_AUTH_SOCK}) {
-  for (io->pipe('ssh-agent -s')->all) {
+  # FIXME - this whole thing doesn't work yet.
+  for (io->pipe('ssh-agent -s')->getlines) {
     my ($var, $val) = split(/=/);
     $ENV{$var} = $val;
   }
