@@ -15,7 +15,7 @@ my $autossh_defaults = {
 };
 
 GetOptions(
-  'H|host=s'     => \(my $host    = undef),
+  'R|host=s'     => \(my $host    = undef),
   's|session:s'  => \(my $session = 'smux-default'),
   'k|ssh-key:s'  => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
   'a|autossh:s%' => \($autossh_defaults),
@@ -62,7 +62,7 @@ smux.pl [options]
 
   Options:
 
-    -H, --host      Remote host to connect [required]
+    -R, --host      Remote host to connect [required]
     -s, --session   Tmux session to attach or create on the remote host (default: smux-default)
     -k, --ssh-key   Path to private ssh key to use for connection
     -a, --autossh   Set autossh environment variables. See the autossh man page
@@ -74,10 +74,10 @@ smux.pl [options]
 
 =head1 EXAMPLES
 
-  smux.pl -h foo.com
-  smux.pl -h foo.com -s misc
-  smux.pl -h foo.com -k ~/.ssh/id_dsa
-  smux.pl -h foo.com -a AUTOSSH_POLL=20 -a AUTOSSH_DEBUG=yes
+  smux.pl -R foo.com
+  smux.pl -R foo.com -s misc
+  smux.pl -R foo.com -k ~/.ssh/id_dsa
+  smux.pl -R foo.com -a AUTOSSH_POLL=20 -a AUTOSSH_DEBUG=yes
 
 =head1 DESCRIPTION
 
