@@ -163,6 +163,7 @@ sub _packages_install {
     autossh
     rofi
     curl
+    pasystray
   )];
 }
 
