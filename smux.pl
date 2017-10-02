@@ -70,7 +70,7 @@ smux.pl [options]
   Options:
 
     -H, --host      Remote host to connect [required]
-    -s, --session   Tmux session to attach or create on the remote host (default: smux-default)
+    -s, --session   Tmux session to attach or create on the remote host (default: smux)
     -k, --ssh-key   Path to private ssh key to use for connection
     -a, --autossh   Set autossh environment variables. See the autossh man page
                     for details on each variable. Currently support variables
