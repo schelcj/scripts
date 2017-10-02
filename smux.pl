@@ -9,7 +9,7 @@ use Pod::Usage;
 use File::Which;
 
 my $autossh = which 'autossh';
-die 'Can not fine autossh' unless $autossh;
+die 'Can not find autossh' unless $autossh;
 
 my $autossh_defaults = {
   AUTOSSH_POLL     => 20,
