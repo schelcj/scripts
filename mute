@@ -1,5 +1,0 @@
-#!/bin/sh
-
-#amixer -q sset Master toggle
-SINK=$(pactl list sinks short | grep RUNNING | awk {'print $1'})
-pactl set-sink-mute $SINK toggle
