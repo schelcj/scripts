@@ -7,7 +7,9 @@ use Data::Dumper;
 use File::Find::Object;
 use Getopt::Long qw(HelpMessage);
 use File::Spec;
+use File::Stat;
 use IO::All;
+use DateTime;
 
 my $PREFIX           = qq($ENV{HOME}/.wallpapers);
 my $LOCK             = qq{$PREFIX/lock};
@@ -100,11 +102,28 @@ sub get_wallpaper_dirs {
 
 sub get_wallpapers {
   my (@dirs) = @_;
-  my $tree = File::Find::Object->new({}, @dirs);
-  my @papers = ();
+
+  my $now     = DateTime->now();
+  my $tree    = File::Find::Object->new({}, @dirs);
+  my @papers  = ();
+  my %weights = (
+    86400   => 1000,
+    604800  => 500,
+    2592000 => 200,
+  );
 
   while (my $leaf = $tree->next()) {
-    push @papers, $leaf if not -d $leaf;
+    next if -d $leaf;
+
+    my $stat = File::Stat->new($leaf);
+
+    for my $weight (keys %weights) {
+      if ((($now->epoch - $weight) < $stat->ctime)) {
+        push @papers, $leaf for (1 .. ($weights{$weight} - 1));
+      }
+    }
+
+    push @papers, $leaf;
   }
 
   return @papers;
@@ -112,12 +131,11 @@ sub get_wallpapers {
 
 sub get_random_wallpaper {
   my ($papers) = @_;
-  my $pos      = int(rand(scalar @{$papers}));
-  my $paper    = $papers->[$pos];
 
-  splice(@{$papers}, $pos, 1);
+  my $pos   = int(rand(scalar @{$papers}));
+  my $paper = $papers->[$pos];
 
-  return $papers->[$pos];
+  return splice(@{$papers}, $pos, 1);
 }
 
 sub set_wallpaper {
