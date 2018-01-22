@@ -11,6 +11,9 @@ use File::Which;
 my $autossh = which 'autossh';
 die 'Can not find autossh' unless $autossh;
 
+my $ssh = which 'ssh';
+die 'Can not find ssh' unless $ssh;
+
 my $autossh_defaults = {
   AUTOSSH_POLL     => 20,
   AUTOSSH_PORT     => undef,
@@ -21,12 +24,13 @@ my $autossh_defaults = {
 };
 
 GetOptions(
-  'a|autossh:s%' => \($autossh_defaults),
-  'H|host=s'     => \(my $host = undef),
-  's|session:s'  => \(my $session = 'smux'),
-  'k|ssh-key:s'  => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
-  'h|help'       => \(my $help = 0),
-  'man'          => \(my $man = 0),
+  'a|autossh:s%'    => \($autossh_defaults),
+  'H|host=s'        => \(my $host = undef),
+  's|session:s'     => \(my $session = 'smux'),
+  'l|list-sessions' => \(my $list_sessions = 1),
+  'k|ssh-key:s'     => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
+  'h|help'          => \(my $help = 0),
+  'man'             => \(my $man = 0),
   )
   or pod2usage(1);
 
@@ -53,6 +57,11 @@ unless (exists $ENV{SSH_AUTH_SOCK}) {
   }
 
   close $fh;
+}
+
+if ($list_sessions) {
+  exec "$ssh $host 'tmux list-sessions'";
+  exit;
 }
 
 exec "$autossh -t $host 'tmux attach -t $session || tmux new-session -s $session'";
