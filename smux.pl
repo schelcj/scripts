@@ -27,7 +27,7 @@ GetOptions(
   'a|autossh:s%'    => \($autossh_defaults),
   'H|host=s'        => \(my $host = undef),
   's|session:s'     => \(my $session = 'smux'),
-  'l|list-sessions' => \(my $list_sessions = 1),
+  'l|list-sessions' => \(my $list_sessions = undef),
   'k|ssh-key:s'     => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
   'h|help'          => \(my $help = 0),
   'man'             => \(my $man = 0),
