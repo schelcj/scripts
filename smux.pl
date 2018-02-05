@@ -110,9 +110,13 @@ but getting mosh installed everywhere is sometimes difficult.
 
 =head1 ENVIRONMENT VARIABLES
 
+=head2 TODO
+
 =over
 
-=item * TODO: define all the autossh vars?
+=item * define all the autossh vars?
+
+=item * add screen support
 
 =back
 
