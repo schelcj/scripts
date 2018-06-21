@@ -60,7 +60,7 @@ unless (exists $ENV{SSH_AUTH_SOCK}) {
 }
 
 if ($list_sessions) {
-  exec "$ssh $host 'tmux list-sessions'";
+  exec "$ssh $host 'tmux list-sessions' | column -t";
   exit;
 }
 
