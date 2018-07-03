@@ -78,19 +78,21 @@ smux.pl [options]
 
   Options:
 
-    -H, --host      Remote host to connect [required]
-    -s, --session   Tmux session to attach or create on the remote host (default: smux)
-    -k, --ssh-key   Path to private ssh key to use for connection
-    -a, --autossh   Set autossh environment variables. See the autossh man page
-                    for details on each variable. Currently support variables
-                    AUTOSSH_POLL, AUTOSSH_PORT, AUTOSSH_GATETIME, AUTOSSH_LOGFILE
-                    AUTOSSH_DEBUG, AUTOSSH_PATH.
-    -h, --help      Usage information
-    --man           Full documentation
+    -H, --host          Remote host to connect [required]
+    -s, --session       Tmux session to attach or create on the remote host (default: smux)
+    -l, --list-sessions List all tmux sessions on remote host
+    -k, --ssh-key       Path to private ssh key to use for connection
+    -a, --autossh       Set autossh environment variables. See the autossh man page
+                        for details on each variable. Currently support variables
+                        AUTOSSH_POLL, AUTOSSH_PORT, AUTOSSH_GATETIME, AUTOSSH_LOGFILE
+                        AUTOSSH_DEBUG, AUTOSSH_PATH.
+    -h, --help          Usage information
+    --man               Full documentation
 
 =head1 EXAMPLES
 
   smux.pl -H foo.com
+  smux.pl -H foo.com -l
   smux.pl -H foo.com -s misc
   smux.pl -H foo.com -k ~/.ssh/id_dsa
   smux.pl -H foo.com -a AUTOSSH_POLL=20 -a AUTOSSH_DEBUG=yes
