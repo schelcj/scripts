@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+use FindBin;
+use lib qq($FindBin::Bin/../perl5/lib/perl5);
+
 use Modern::Perl;
 use IO::All;
 
