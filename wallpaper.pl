@@ -65,7 +65,7 @@ sub _set {
     $set_paper = 1;
   } else {
     while (my $paper = get_random_wallpaper($papers)) {
-      next if exists $history{shift};
+      next if exists $history{$paper};
       $rc        = set_wallpaper($paper);
       $set_paper = 1;
       last;
