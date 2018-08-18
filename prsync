@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Original Source: https://wiki.ncsa.illinois.edu/display/~wglick/Parallel+Rsync
+
+DRYRUN=0
+VERBOSE=0
+THREADS=8
+
+while getopts "s:d:t:vn" opt; do
+  case $opt in
+    s)
+      SRCDIR=$OPTARG
+      ;;
+    d)
+      DESTDIR=$OPTARG
+      ;;
+    t)
+      THREADS=$OPTARG
+      ;;
+    n)
+      DRYRUN=1
+      ;;
+    v)
+      VERBOSE=1
+      ;;
+    h|help)
+      echo "Usage: $0 [s|d|t]"
+      exit 1
+      ;;
+    *)
+      echo "Usage: $0 [s|d|t]"
+      exit 1
+  esac
+done
+
+if [ $VERBOSE -eq 1 ]; then
+  echo "SRCDIR: $SRCDIR"
+  echo "DESTDIR: $DESTDIR"
+  echo "THREADS: $THREADS"
+fi
+
+# RSYNC DIRECTORY STRUCTURE
+if [ $DRYRUN -eq 1 ]; then
+  echo "rsync -vr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/"
+else
+  rsync -vr -f"+ */" -f"- *" $SRCDIR/ $DESTDIR/
+fi
+
+# FOLLOWING MAYBE FASTER BUT NOT AS FLEXIBLE
+# cd $SRCDIR; find . -type d -print0 | cpio -0pdm $DESTDIR/
+
+# FIND ALL FILES AND PASS THEM TO MULTIPLE RSYNC PROCESSES
+if [ $DRYRUN -eq 1 ]; then
+  echo "cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -av % $DESTDIR/% "
+else
+  cd $SRCDIR; find . ! -type d -print0 | xargs -0 -n1 -P$THREADS -I% rsync -av --no-g % $DESTDIR/%
+fi
+
+# IF YOU WANT TO LIMIT THE IO PRIORITY, 
+# PREPEND THE FOLLOWING TO THE rsync & cd/find COMMANDS ABOVE:
+# ionice -c2

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case $(tty) in
+  /dev/pts/[0-9]*)
+    VIM=vi
+    ;;
+  *)
+    VIM=gvim
+    ;;
+esac
+
+$VIM \
+  -c ':let g:pad#window_height=40' \
+  -c ':let g:pad#open_in_split=0' \
+  -c ':Pad search'

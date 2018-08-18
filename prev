@@ -2,16 +2,16 @@
 
 case "$(playerctl -l)" in
   spotify|google-play-music-desktop-player|clementine)
-    playerctl next
+    playerctl previous
     ;;
 esac
 
 if [ -n "$(pidof pianobar)" ]; then
-  echo -n 'n' > ~/.config/pianobar/ctl
+  echo -n 'p' > ~/.config/pianobar/ctl
   exit
 fi
 
 if [ -n "$(pidof mplayer)" ]; then
-  echo 'pt_step 1' > /tmp/mplayer
+  echo 'pt_step -1' > /tmp/mplayer
   exit
 fi

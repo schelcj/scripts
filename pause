@@ -1,5 +1,11 @@
 #!/bin/sh
 
+case "$(playerctl -l)" in
+  spotify|google-play-music-desktop-player|clementine)
+    playerctl play-pause
+    ;;
+esac
+
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'p' > ~/.config/pianobar/ctl
   exit

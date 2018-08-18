@@ -16,3 +16,7 @@ requires 'Try::Tiny';
 requires 'Getopt::Std::Strict';
 requires 'Text::CSV::Slurp';
 requires 'iCal::Parser';
+requires 'Term::ReadLine::Perl';
+requires 'DBM::Deep';
+requires 'File::Stat';
+requires 'DateTime';
