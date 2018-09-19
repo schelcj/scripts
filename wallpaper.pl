@@ -114,6 +114,7 @@ sub get_wallpapers {
 
   while (my $leaf = $tree->next()) {
     next if -d $leaf;
+    next if exists $history{$leaf};
 
     my $stat = File::Stat->new($leaf);
 
