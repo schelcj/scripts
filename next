@@ -15,3 +15,8 @@ if [ -n "$(pidof mplayer)" ]; then
   echo 'pt_step 1' > /tmp/mplayer
   exit
 fi
+
+if [ -n "$(pidof cmus)" ]; then
+  cmus-remote -n
+  exit
+fi

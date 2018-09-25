@@ -15,3 +15,8 @@ if [ -n "$(pidof mplayer)" ]; then
   echo 'pause' > /tmp/mplayer
   exit
 fi
+
+if [ -n "$(pidof cmus)" ]; then
+  cmus-remote -u
+  exit
+fi
