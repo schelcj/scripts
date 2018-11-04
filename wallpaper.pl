@@ -20,6 +20,10 @@ my $PREVIOUS         = qq{$PREFIX/previous};
 my $SOURCES          = qq{$PREFIX/sources};
 my $DEFAULT_CATEGORY = q{all};
 
+unless (-e $WALLPAPER_DIR) {
+  die "Wallpaper directory, $WALLPAPER_DIR, does not exist";
+}
+
 my %history = ();
 tie %history, 'DB_File', qq{$PREFIX/history};    ## no critic (ProhibitTies)
 
