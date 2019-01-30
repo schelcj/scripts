@@ -21,3 +21,7 @@ if [ -n "$(pidof cmus)" ]; then
   exit
 fi
 
+if [ -n "$(pidof sconsify)" ]; then
+  sconsify -command replay
+  exit
+fi

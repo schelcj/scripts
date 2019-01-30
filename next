@@ -20,3 +20,8 @@ if [ -n "$(pidof cmus)" ]; then
   cmus-remote -n
   exit
 fi
+
+if [ -n "$(pidof sconsify)" ]; then
+  sconsify -command next
+  exit
+fi

@@ -20,3 +20,8 @@ if [ -n "$(pidof cmus)" ]; then
   cmus-remote -u
   exit
 fi
+
+if [ -n "$(pidof sconsify)" ]; then
+  sconsify -command play_pause
+  exit
+fi
