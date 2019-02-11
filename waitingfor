@@ -1,4 +1,5 @@
 #!/bin/sh
-rtm add $* l:WaitingFor
-echo "$*" | mail -s "$* #waitingfor" $(cat ~/.config/trello/gtd-addr.txt)
-#task add +waitingfor $*
+rtm add $* t:waitingfor
+
+# echo "$*" | mail -s "$* #waitingfor" $(cat ~/.config/trello/gtd-addr.txt)
+# task add +waitingfor $*
