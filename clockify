@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Getopt::Long::Subcommand;
+use Data::Dumper;
+
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+my $cmd_map = {
+  start => \&_start,
+  stop  => \&_stop,
+};
+
+my $cmd = shift @ARGV;
+die "Unknown subcommand $cmd" unless exists $cmd_map->{$cmd};
+$cmd_map->{$cmd}->(@ARGV);
+
+sub _start($args) {
+  my ($project, $task) = split(/\@/, $args);
+  say "PROJECT: $project";
+  say "TASK: $task" if $task;
+}
+
+sub _stop {
+  say "STOP";
+}
