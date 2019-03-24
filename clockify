@@ -1,12 +1,16 @@
 #!/usr/bin/env perl
 
-use Modern::Perl;
-use Getopt::Long::Subcommand;
-use Data::Dumper;
-
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
+use Modern::Perl;
+
+use Mojo::UserAgent;
+use Mojo::URL;
+
+use Data::Dumper;
+
+my $api_url = Mojo::URL->new('https://api.clockify.me/api');
 my $cmd_map = {
   start => \&_start,
   stop  => \&_stop,
@@ -20,8 +24,62 @@ sub _start($args) {
   my ($project, $task) = split(/\@/, $args);
   say "PROJECT: $project";
   say "TASK: $task" if $task;
+
+  # get all tasks for a project
+  #
+  # GET /workspaces/{workspaceId}/projects/{projectId}/tasks/
+  #
+
+  # add new task
+  #
+  # POST /workspaces/{workspaceId}/projects/{projectId}/tasks/
+  #
+  # PAYLOAD:
+  #
+  # {
+  #   "id": "string",
+  #   "name": "string",
+  #   "projectId": "string",
+  #   "assigneeId": "string",
+  #   "estimate": "string",
+  #   "status": "string"
+  # }
+
+  # start timer
+  #
+  # POST /workspaces/{workspaceId}/timeEntries/
+  #
+  # PAYLOAD:
+  # {
+  #   c:xa
+  #   "start": "string",
+  #   "billable": "boolean",
+  #   "description": "string",
+  #   "projectId": "string",
+  #   "taskId": "string",
+  #   "end": "string",
+  #   "tagIds": [
+  #     "string"
+  #   ]
+  # }
+
+
+  # TODO
+  #   - if given a task
+  #     - find the task 
+  #     - create if the task does not exist
+  #   - 
 }
 
 sub _stop {
-  say "STOP";
+  #
+  # PUT /workspaces/{workspaceId}/timeEntries/endStarted
+  #
+  # TODO
+  #   - get workspace id
+  #   - build url with id
+  #   - make PUT request to end timer
+  #   - if the response is 204 it succeeded otherwise it failed
 }
+
+
