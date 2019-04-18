@@ -1,5 +1,5 @@
 #!/bin/sh
-rtm add $* t:followup
+rtm add $* l:followup
 
 # echo "$*" | mail -s "$* #followup" $(cat ~/.config/trello/gtd-addr.txt)
 # task add +followup $*

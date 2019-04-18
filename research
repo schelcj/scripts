@@ -1,0 +1,2 @@
+#!/bin/sh
+rtm add $* l:research
