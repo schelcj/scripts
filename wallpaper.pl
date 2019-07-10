@@ -30,7 +30,10 @@ tie %history, 'DB_File', qq{$PREFIX/history};    ## no critic (ProhibitTies)
 GetOptions(
   'category|c=s'  => sub {$_[1] > io($CATEGORY)},
   'clear'         => sub {unlink $CATEGORY},
-  'flush-cache|f' => sub {flush_cache()},
+  'flush-cache|f' => sub {
+    %history = ();
+    exit;
+  },
   'lock|l'        => sub {2 > io($LOCK)},
   'unlock|u'      => sub {unlink($LOCK)},
   'previous|p'    => sub {
@@ -146,17 +149,13 @@ sub get_random_wallpaper {
 sub set_wallpaper {
   my ($paper) = @_;
 
-  my $rv = io->pipe(qq{fbsetbg -f $paper})->all;
+  my $rv = io->pipe(qq{fbsetbg -f '$paper'})->all;
 
   $history{$paper} = 1;
   rename $CURRENT, $PREVIOUS;
   shift > io($CURRENT);
 
   return $rv;
-}
-
-sub flush_cache {
-  %history = ();
 }
 
 __END__
