@@ -1,8 +1,11 @@
 #!/bin/sh
 
-case "$(playerctl -l)" in
-  spotify|google-play-music-desktop-player|clementine)
-    playerctl next
+player=$(player -l | grep -v chrome)
+
+case "$player" in
+  spotify|ncspot|google-play-music-desktop-player|clementine)
+    playerctl -p $player next
+    exit
     ;;
 esac
 
