@@ -1,6 +1,6 @@
 #!/bin/sh
 
-player=$(player -l | grep -v chrome)
+player=$(playerctl -l | grep -v chrome)
 
 case "$player" in
   spotify|ncspot|google-play-music-desktop-player|clementine)
