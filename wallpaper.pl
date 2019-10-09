@@ -80,7 +80,7 @@ sub _set {
   }
 
   if (not $set_paper) {
-    flush_cache();
+    %history = ();
   } else {
     return $rc;
   }
