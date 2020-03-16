@@ -12,7 +12,6 @@ rofi \
   -ssh \
   -set \
   -title true \
-<<<<<<< HEAD
   -switchers "window,run,drun,ssh,Workspaces:i3_switch_workspaces.sh" \
   -show ${SHOW:='run'} \
   -width 35 \
