@@ -4,48 +4,69 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-use Getopt::Long qw(:config no_ignore_case);
-use Pod::Usage;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+use Getopt::Long qw(:config auto_help no_ignore_case);
 use File::Which;
+use Pod::Usage;
 
-my $autossh = which 'autossh';
-die 'Can not find autossh' unless $autossh;
+my $cmd = 'autossh';
+GetOptions(
+  'r|remote:s'   => \(my $host = undef),
+  'a|autossh:s%' => \(
+    my $autossh_defaults = {
+      AUTOSSH_POLL     => undef,
+      AUTOSSH_PORT     => undef,
+      AUTOSSH_GATETIME => undef,
+      AUTOSSH_LOGFILE  => undef,
+      AUTOSSH_DEBUG    => undef,
+      AUTOSSH_PATH     => undef,
+    }
+  ),
+  'm|mosh' => sub ($opt, $val) {
+    $cmd = 'mosh' if $val;
+  },
+  's|session:s' => \(my $session = 'smux'),
+  'k|ssh-key:s' => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
+  'l|list-sessions' => sub ($opt, $val) {
+    my $host = ${$opt->{linkage}->{r}};
+    my $ssh  = ${$opt->{linkage}->{'bin-ssh'}};
 
-my $ssh = which 'ssh';
-die 'Can not find ssh' unless $ssh;
+    exec "$ssh $host 'tmux list-sessions' | column -t";
 
-my $autossh_defaults = {
-  AUTOSSH_POLL     => 20,
-  AUTOSSH_PORT     => undef,
-  AUTOSSH_GATETIME => undef,
-  AUTOSSH_LOGFILE  => undef,
-  AUTOSSH_DEBUG    => undef,
-  AUTOSSH_PATH     => undef,
+    exit;
+  },
+  'bin-autossh' => \(my $autossh = which 'autossh'),
+  'bin-ssh'     => \(my $ssh     = which 'ssh'),
+  'bin-mosh'    => \(my $mosh    = which 'mosh'),
+  'man'         => \(my $man     = 0),
+);
+
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+pod2usage(-exitval => 1, -verbose => 0, -msg => 'Hostname is required') unless $host;
+
+my $tmux_cmd = "tmux attach -t $session || tmux new-session -s $session";
+my $cmd_ref  = {
+  mosh => sub ($host) {
+    return "$mosh -- $host $tmux_cmd";
+  },
+  autossh => sub ($host) {
+    return "$autossh -t $host '$tmux_cmd'";
+  },
 };
 
-GetOptions(
-  'a|autossh:s%'    => \($autossh_defaults),
-  'H|host=s'        => \(my $host = undef),
-  's|session:s'     => \(my $session = 'smux'),
-  'l|list-sessions' => \(my $list_sessions = undef),
-  'k|ssh-key:s'     => \(my $ssh_key = "$ENV{HOME}/.ssh/id_rsa"),
-  'h|help'          => \(my $help = 0),
-  'man'             => \(my $man = 0),
-  )
-  or pod2usage(1);
+if ($cmd eq 'autossh') {
+  {
+    $autossh_defaults->{AUTOSSH_PORT} = int(rand(32000));
+    last if $autossh_defaults->{AUTOSSH_PORT} >= 20000;
+    redo;
+  }
 
-pod2usage(1) if $help;
-pod2usage(-exitval => 0, -verbose => 2) if $man;
-
-{
-  $autossh_defaults->{AUTOSSH_PORT} = int(rand(32000));
-  last if $autossh_defaults->{AUTOSSH_PORT} >= 20000;
-  redo;
-}
-
-for (keys %{$autossh_defaults}) {
-  next unless defined $autossh_defaults->{$_};
-  $ENV{$_} = $autossh_defaults->{$_};
+  for (keys %{$autossh_defaults}) {
+    next unless defined $autossh_defaults->{$_};
+    $ENV{$_} = $autossh_defaults->{$_};
+  }
 }
 
 unless (exists $ENV{SSH_AUTH_SOCK}) {
@@ -59,12 +80,7 @@ unless (exists $ENV{SSH_AUTH_SOCK}) {
   close $fh;
 }
 
-if ($list_sessions) {
-  exec "$ssh $host 'tmux list-sessions' | column -t";
-  exit;
-}
-
-exec "$autossh -t $host 'tmux attach -t $session || tmux new-session -s $session'";
+exec $cmd_ref->{$cmd}->($host);
 
 __END__
 
@@ -74,11 +90,12 @@ smux.pl - ssh with auto-reconnect and tmux
 
 =head1 SYNOPSIS
 
-smux.pl [options]
+smux.pl -r HOST [OPTIONS]
 
   Options:
 
-    -H, --host          Remote host to connect [required]
+    -r, --remote        Remote host to connect [required]
+    -c, --cmd           How to connect to the remote host, autossh or mosh (default: autossh)
     -s, --session       Tmux session to attach or create on the remote host (default: smux)
     -l, --list-sessions List all tmux sessions on remote host
     -k, --ssh-key       Path to private ssh key to use for connection
@@ -86,16 +103,22 @@ smux.pl [options]
                         for details on each variable. Currently support variables
                         AUTOSSH_POLL, AUTOSSH_PORT, AUTOSSH_GATETIME, AUTOSSH_LOGFILE
                         AUTOSSH_DEBUG, AUTOSSH_PATH.
-    -h, --help          Usage information
+
+    --bin-autossh       Path to auto ssh binary
+    --bin-ssh           Path to ssh binary
+    --bin-mosh          Path to mosh binary
+
+    -h, -?, --help      Usage information
     --man               Full documentation
 
 =head1 EXAMPLES
 
-  smux.pl -H foo.com
-  smux.pl -H foo.com -l
-  smux.pl -H foo.com -s misc
-  smux.pl -H foo.com -k ~/.ssh/id_dsa
-  smux.pl -H foo.com -a AUTOSSH_POLL=20 -a AUTOSSH_DEBUG=yes
+  smux.pl -r foo.com
+  smux.pl -r foo.com -m
+  smux.pl -r foo.com -l
+  smux.pl -r foo.com -s misc
+  smux.pl -r foo.com -k ~/.ssh/id_dsa
+  smux.pl -r foo.com -a AUTOSSH_POLL=20 -a AUTOSSH_DEBUG=yes
 
 =head1 DESCRIPTION
 
@@ -108,7 +131,8 @@ doing getopts in bash.
 This script relies uses autossh to maintain a connect to the remote host and
 will attach to an existing tmux session, or create a new session, on the
 remote host. I have been using mosh to maintain a connection to remote hosts
-but getting mosh installed everywhere is sometimes difficult.
+but getting mosh installed everywhere is sometimes difficult. That said, this
+script can now use mosh if it is available on the remote host.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -119,6 +143,8 @@ but getting mosh installed everywhere is sometimes difficult.
 =item * define all the autossh vars?
 
 =item * add screen support
+
+=item * make hostname not require an argument flag
 
 =back
 
