@@ -8,7 +8,7 @@ use File::Temp;
 use File::Slurp qw(read_file);
 use Try::Tiny;
 
-my $somafm_url         = q{http://somafm.com};
+my $somafm_url         = q{https://somafm.com};
 my $backtitle          = q{SomaFM: Listener Supported, Commercial Free Internet Radio};
 my $title              = q{Select a station to listen to};
 my $radiolist_title    = q{Select a station to listen to};
@@ -61,15 +61,12 @@ sub get_stations {
   my $dom      = Mojo::DOM->new($agent->get($somafm_url)->res->body);
   my @stations = ();
 
-  $dom->find('li.cbshort')->each(
-    sub {
-      my $node = shift;
-      (my $station_name = $node->at('a:first-child')->attr('href')) =~ s/\///g;
-      my $station_title = $node->at('h3')->text();
+  for my $node ($dom->find('li.cbshort')->each) {
+    (my $station_name = $node->at('a:first-child')->attr('href')) =~ s/\///g;
+    my $station_title = $node->at('h3')->text();
 
-      push @stations, [$station_title, $station_name];
-    }
-  );
+    push @stations, [$station_title, $station_name];
+  }
 
   return @stations;
 }
