@@ -134,6 +134,7 @@ sub get_wallpapers {
     push @papers, $leaf;
   }
 
+  # TODO - can @papers be empty?
   return @papers;
 }
 
