@@ -3,7 +3,7 @@
 player=$(playerctl -l | grep -v chrome)
 
 case "$player" in
-  spotify|ncspot|google-play-music-desktop-player|clementine)
+  spotify|spotifyd|ncspot|google-play-music-desktop-player|clementine)
     playerctl -p $player next
     exit
     ;;
