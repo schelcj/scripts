@@ -1,0 +1,5 @@
+#!/bin/sh
+
+playing=$(pacmd list-sink-inputs | grep -A 20 RUNNING | grep application.name|cut -d\" -f2|tr 'A-Z' 'a-z')
+
+echo "$playing"
