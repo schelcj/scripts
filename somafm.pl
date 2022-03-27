@@ -24,7 +24,7 @@ while (1) {
 sub play {
   my ($station) = @_;
 
-  my $url = sprintf qq{$somafm_url/startstream=%s.pls}, $station;
+  my $url = "$somafm_url/m3u/$station.m3u";
 
   run(qq{mplayer $mplayer_opts $url 2>&1 | dialog --progressbox $dialog_geom});
 
