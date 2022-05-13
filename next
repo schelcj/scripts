@@ -1,13 +1,6 @@
 #!/bin/sh
 
-player=$(playerctl -l | grep -v chrome)
-
-case "$player" in
-  spotify|spotifyd|ncspot|google-play-music-desktop-player|clementine)
-    playerctl -p $player next
-    exit
-    ;;
-esac
+player=$(playerctl -l | grep -v chrom)
 
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'n' > ~/.config/pianobar/ctl
@@ -28,3 +21,12 @@ if [ -n "$(pidof sconsify)" ]; then
   sconsify -command next
   exit
 fi
+
+case "$player" in
+  spotify|spotifyd|ncspot|google-play-music-desktop-player|clementine)
+    playerctl -p $player next
+    exit
+    ;;
+esac
+
+
