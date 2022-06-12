@@ -2,9 +2,6 @@
 
 # player=$(playerctl -l | grep -v chromium)
 # player=$(playerctl -l)
-
-# echo $player
-
 # case "$player" in
 #   spotify|spotifyd|ncspot|clementine|chrom*)
 #     playerctl -p $player next

@@ -15,7 +15,6 @@
 #     ;;
 # esac
 
-
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'p' > ~/.config/pianobar/ctl
   exit
