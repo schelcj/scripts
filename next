@@ -1,13 +1,20 @@
 #!/bin/sh
 
-player=$(playerctl -l | grep -v chrome)
+# player=$(playerctl -l | grep -v chromium)
+# player=$(playerctl -l)
 
-case "$player" in
-  spotify|spotifyd|ncspot|google-play-music-desktop-player|clementine)
-    playerctl -p $player next
-    exit
-    ;;
-esac
+# echo $player
+
+# case "$player" in
+#   spotify|spotifyd|ncspot|clementine|chrom*)
+#     playerctl -p $player next
+#     exit
+#     ;;
+#   tizonia*)
+#     tizonia-remote next
+#     exit
+#     ;;
+# esac
 
 if [ -n "$(pidof pianobar)" ]; then
   echo -n 'n' > ~/.config/pianobar/ctl
@@ -24,7 +31,4 @@ if [ -n "$(pidof cmus)" ]; then
   exit
 fi
 
-if [ -n "$(pidof sconsify)" ]; then
-  sconsify -command next
-  exit
-fi
+playerctl next
