@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# emacs27 -f deft
+
 case $(tty) in
   /dev/pts/[0-9]*)
     VIM=vi
