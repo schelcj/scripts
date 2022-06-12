@@ -15,7 +15,7 @@ requires 'Mojo::UserAgent';
 requires 'Perl::Critic';
 requires 'Perl::Tidy';
 requires 'Proc::Daemon';
-requires 'Readonly::XS';
+#requires 'Readonly::XS';
 requires 'System::Command';
 requires 'Term::ReadLine::Perl';
 requires 'Text::CSV::Slurp';
