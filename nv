@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# emacs27 -f deft
+emacsclient -c -e '(deft)'
+
+exit
 
 case $(tty) in
   /dev/pts/[0-9]*)
