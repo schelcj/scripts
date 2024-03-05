@@ -13,7 +13,7 @@ IO::Socket::SSL::set_defaults(
   SSL_verify_mode => SSL_VERIFY_NONE
 );
 
-my $somafm_url         = q{https://somafm.com};
+my $somafm_url         = q{https://somafm.com/};
 my $backtitle          = q{SomaFM: Listener Supported, Commercial Free Internet Radio};
 my $title              = q{Select a station to listen to};
 my $radiolist_title    = q{Select a station to listen to};

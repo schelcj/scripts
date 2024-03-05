@@ -28,4 +28,9 @@ if [ -n "$(pidof cmus)" ]; then
   exit
 fi
 
+if [ -n "$(pidof ncspot)" ]; then
+  playerctl -p $(playerctl -l | grep ncspot) next
+  exit
+fi
+
 playerctl next
