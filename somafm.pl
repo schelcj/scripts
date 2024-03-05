@@ -4,9 +4,14 @@ use Modern::Perl;
 use Mojo::UserAgent;
 use Mojo::DOM;
 use IPC::System::Simple qw(run);
+use IO::Socket::SSL qw(SSL_VERIFY_NONE);
 use File::Temp;
 use File::Slurp qw(read_file);
 use Try::Tiny;
+
+IO::Socket::SSL::set_defaults(
+  SSL_verify_mode => SSL_VERIFY_NONE
+);
 
 my $somafm_url         = q{https://somafm.com};
 my $backtitle          = q{SomaFM: Listener Supported, Commercial Free Internet Radio};
@@ -61,7 +66,7 @@ sub get_stations {
   my $dom      = Mojo::DOM->new($agent->get($somafm_url)->res->body);
   my @stations = ();
 
-  for my $node ($dom->find('li.cbshort')->each) {
+  for my $node ($dom->find('div#alpha_channels li.cbshort')->each) {
     (my $station_name = $node->at('a:first-child')->attr('href')) =~ s/\///g;
     my $station_title = $node->at('h3')->text();
 
