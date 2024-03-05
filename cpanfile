@@ -5,6 +5,7 @@ requires 'File::Find::Object';
 requires 'File::Flock';
 requires 'File::Flock::Tiny';
 requires 'File::Slurp';
+requires 'File::ShareDir';
 requires 'File::Stat';
 requires 'Getopt::Compact';
 requires 'Getopt::Std::Strict';
