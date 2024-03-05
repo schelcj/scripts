@@ -1,6 +1,6 @@
 #!/bin/sh
 
-emacsclient -c -e '(deft)'
+emacsclient -c -F '((name . "nv"))' -e '(deft)'
 
 exit
 
