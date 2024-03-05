@@ -35,4 +35,9 @@ if [ -n "$(pidof sconsify)" ]; then
   exit
 fi
 
+if [ -n "$(pidof ncspot)" ]; then
+  playerctl -p $(playerctl -l | grep ncspot) play-pause
+  exit
+fi
+
 playerctl play-pause
