@@ -8,6 +8,11 @@ use File::Temp;
 use File::Slurp qw(read_file write_file append_file);
 use Try::Tiny;
 use URI;
+use IO::Socket::SSL qw(SSL_VERIFY_NONE);
+
+IO::Socket::SSL::set_defaults(
+  SSL_verify_mode => SSL_VERIFY_NONE
+);
 
 my $di_url             = q{http://www.di.fm/webplayer3/config};
 my $di_fm_url          = q{http://pub%d.di.fm:80/di_%s};
