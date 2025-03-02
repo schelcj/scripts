@@ -7,7 +7,5 @@ rofi \
   -ssh \
   -title true \
   -switchers "window,run,drun,ssh,Workspaces:i3_switch_workspaces.sh" \
-  -show ${SHOW:='run'} \
-  -location 0 \
-  -lines 8
+  -show ${SHOW:='run'}
 
