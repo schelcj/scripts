@@ -7,7 +7,7 @@ use Data::Dumper;
 use File::Find::Object;
 use Getopt::Long qw(HelpMessage);
 use File::Spec;
-use File::Stat;
+use File::Stat::OO;
 use IO::All;
 use DateTime;
 
@@ -123,10 +123,11 @@ sub get_wallpapers {
     next if -d $leaf;
     next if exists $history{$leaf};
 
-    my $stat = File::Stat->new($leaf);
+    my $stat = File::Stat::OO->new();
+    $stat->stat($leaf);
 
     for my $weight (keys %weights) {
-      if ((($now->epoch - $weight) < $stat->ctime)) {
+      if ((($now->epoch - $weight) < $stat->ctime||0)) {
         push @papers, $leaf for (1 .. ($weights{$weight} - 1));
       }
     }

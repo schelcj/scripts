@@ -6,7 +6,7 @@ requires 'File::Flock';
 requires 'File::Flock::Tiny';
 requires 'File::Slurp';
 requires 'File::ShareDir';
-requires 'File::Stat';
+requires 'File::Stat::OO';
 requires 'Getopt::Compact';
 requires 'Getopt::Std::Strict';
 requires 'IO::All';
