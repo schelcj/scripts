@@ -1,0 +1,2 @@
+#!/bin/sh
+$HOME/Apps/pomotroid-0.13.0-linux/pomotroid --no-sandbox
