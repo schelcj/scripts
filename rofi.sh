@@ -7,5 +7,5 @@ rofi \
   -ssh \
   -title true \
   -switchers "window,run,drun,ssh,Workspaces:i3_switch_workspaces.sh" \
-  -show ${SHOW:='run'}
-
+  -show ${SHOW:='run'} \
+  -theme-str 'window {width: 25%;}'
