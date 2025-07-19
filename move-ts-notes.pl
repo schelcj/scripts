@@ -11,7 +11,7 @@ use IO::All;
 my $archive_dir  = File::Spec->join($ENV{HOME}, 'Dropbox', 'Archives', 'Tagspaces');
 my $output_dir   = File::Spec->join($ENV{HOME}, 'MigratedNotes');
 my @notes        = io->dir($archive_dir)->all;
-my @default_tags = (qw(ts));
+my @default_tags = (qw(tagspaces));
 
 for my $note (@notes) {
   print 'migrating ' . $note->name;
@@ -41,6 +41,7 @@ for my $note (@notes) {
   $denote_title =~ s/_/-/g;
   $denote_title =~ s/,//g;
   $denote_title =~ s/[^\x00-\x7F]//g;
+  $denote_title =~ s/['&!();\[\]`+=]//g;
 
   push @tags, @default_tags;
 
