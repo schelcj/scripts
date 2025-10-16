@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Thanks Adam....
+
+datafile="$(dirname $0)/.8ball_answers";
+[ -f "$datafile" ] || {
+    echo "No Magic 8 Ball available";
+    return 1
+};
+printf "\n\t";
+shuf "$datafile" | head -n1;
+printf "\n"
