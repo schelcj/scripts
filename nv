@@ -1,6 +1,7 @@
 #!/bin/sh
 
-emacsclient -c -F '((name . "nv"))' -e '(deft)'
+# emacsclient -c -F '((name . "nv"))' -e '(deft)'
+emacsclient -c -F '((name . "nv"))' -e '(consult-denote-grep)'
 
 exit
 
