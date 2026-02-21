@@ -50,10 +50,6 @@
   [spec]
   (cli/format-opts (merge spec {:order (vec (keys (:spec spec)))})))
 
-(def nrtm "nrtm.radb.net")
-(def whois "whois.radb.net")
-(def db "RADB")
-
 (defn query-whois!
   "Using the `!J<SOURCE>` query get the current NRTM status."
   [host source]
@@ -78,14 +74,22 @@
   (let [status (get-nrtm-status host source)]
     (:serial_newest_mirror status)))
 
-;; (println (get-current-serial nrtm db))
-;; (println (get-current-serial whois db))
+(defn drift
+  ""
+  [primary mirror source]
+  (let [primary-serial (get-current-serial primary source)
+        mirror-serial (get-current-serial mirror source)]
+    (- primary-serial mirror-serial)))
 
 (defn -main
   [args]
   (let [opts (cli/parse-opts args cli-spec)]
     (if (or (:help opts) (:h opts))
       (println (show-help cli-spec))
-      (println opts))))
+      (let [drift (drift (:primary opts) (:mirror opts) (:source opts))]
+        (if (> drift (:drift opts))
+          (println "[WARN] - the mirror is out of sync - " drift)
+          (println "[OK] - mirror is in sync - " drift)))
+      )))
 
 (-main *command-line-args*)
