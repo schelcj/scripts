@@ -24,6 +24,7 @@
 
 (require '[babashka.cli :as cli])
 (require '[cheshire.core :as json])
+(require '[clojure.pprint :refer [cl-format]])
 (import '[java.net Socket])
 
 (def cli-spec 
@@ -40,9 +41,13 @@
                 :desc "Source database to compare (e.g. RADB)"
                 :default "RADB"
                 :required true}
-        :drift {
-                :desc "How far can the serials of the source and mirror drift"
+        :warning {
+                :desc "Amount of drift for warning state [defualt 30]"
                 :default 30
+                :required true}
+        :critical {
+                :desc "Amount of drift for critical state [default 50]"
+                :default 50
                 :required true
                 }}})
 
@@ -81,15 +86,31 @@
         mirror-serial (get-current-serial mirror source)]
     (- primary-serial mirror-serial)))
 
+(defn check-state
+  ""
+  [warning critical drift]
+  (cond
+    (>= drift critical)
+    (do
+      (println (cl-format nil "NRTM CRITICAL - Mirror out of sync [~d/~d]" drift critical))
+      (System/exit 2))
+    (>= drift warning)
+    (do
+      (println (cl-format nil "NRTM WARNING - Mirror delayed [~d/~d]" drift warning))
+      (System/exit 1))
+    (< drift 0)
+    (do
+      (println (cl-format nil "NRTM UNKNOWN - Mirror state unknown [~d/~d]" drift 0))
+      (System/exit 3)))
+  (println "NRTM OK - Mirror in sync")
+  (System/exit 0))
+
 (defn -main
   [args]
   (let [opts (cli/parse-opts args cli-spec)]
     (if (or (:help opts) (:h opts))
       (println (show-help cli-spec))
       (let [drift (drift (:primary opts) (:mirror opts) (:source opts))]
-        (if (> drift (:drift opts))
-          (println "[WARN] - the mirror is out of sync - " drift)
-          (println "[OK] - mirror is in sync - " drift)))
-      )))
+        (check-state (:warning opts) (:critical opts) drift)))))
 
 (-main *command-line-args*)
