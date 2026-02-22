@@ -1,5 +1,8 @@
 #!/usr/bin/env bb
 
+;; babashka install instructions
+;; https://github.com/babashka/babashka#installation
+
 ;; Example query results
 ;; $ echo '!JRADB' | nc nrtm.radb.net 43
 ;; A526
