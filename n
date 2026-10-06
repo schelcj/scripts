@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use local::lib;
+use File::Spec;
+use IO::All;
+use POSIX qw(strftime);
+
+my $inbox = File::Spec->join($ENV{HOME}, 'Dropbox', 'Org', 'inbox.org');
+my $date  = strftime '%Y-%m-%d %a %I:%M', localtime;
+my ($title, $body) = split(/\s\/\/\s/, join(' ', @ARGV));
+
+my $content = <<"EOF";
+* NOTE $title
+/Entered on/ [$date]
+EOF
+
+$content .= "$body\n" if $body;
+
+$content >> io($inbox);
